@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle of Britain — Operational Simulation</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Setup Screen -->
+        <div id="setup-screen" class="screen active">
+            <div class="setup-container">
+                <h1>BATTLE OF BRITAIN</h1>
+                <h2>Operational Simulation — July–October 1940</h2>
+                <div class="setup-options">
+                    <div class="option-group">
+                        <label>Command:</label>
+                        <div class="side-select">
+                            <button class="side-btn selected" data-side="raf">
+                                <span class="side-icon">🇬🇧</span>
+                                <span class="side-name">RAF Fighter Command</span>
+                                <span class="side-desc">Defend Britain against the Luftwaffe onslaught</span>
+                            </button>
+                            <button class="side-btn" data-side="luftwaffe">
+                                <span class="side-icon">✠</span>
+                                <span class="side-name">Luftwaffe</span>
+                                <span class="side-desc">Achieve air superiority over southern England</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button id="start-btn" class="primary-btn">Begin Campaign</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <!-- Top Bar -->
+            <header id="top-bar">
+                <div class="bar-section" id="date-display">
+                    <span class="label">Date</span>
+                    <span class="value" id="current-date">10 July 1940</span>
+                </div>
+                <div class="bar-section" id="time-display">
+                    <span class="label">Time</span>
+                    <span class="value" id="current-time">06:00</span>
+                </div>
+                <div class="bar-section" id="phase-display">
+                    <span class="label">Phase</span>
+                    <span class="value" id="current-phase">Kanalkampf</span>
+                </div>
+                <div class="bar-section" id="weather-display">
+                    <span class="label">Weather</span>
+                    <span class="value" id="current-weather">Fair</span>
+                </div>
+                <div class="bar-section" id="turn-display">
+                    <span class="label">Turn</span>
+                    <span class="value" id="current-turn">0</span>
+                </div>
+                <div class="bar-controls">
+                    <select id="time-scale">
+                        <option value="1">1 Hour</option>
+                        <option value="4">4 Hours</option>
+                        <option value="12">12 Hours</option>
+                        <option value="24">1 Day</option>
+                    </select>
+                    <button id="advance-btn" class="control-btn">Advance ▶</button>
+                    <button id="auto-btn" class="control-btn">Auto ▶▶</button>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <div id="main-content">
+                <!-- Map Panel -->
+                <div id="map-panel">
+                    <canvas id="map-canvas"></canvas>
+                    <div id="map-legend">
+                        <span class="legend-item"><span class="dot raf-dot"></span> RAF Airfield</span>
+                        <span class="legend-item"><span class="dot lw-dot"></span> Luftwaffe Base</span>
+                        <span class="legend-item"><span class="dot radar-dot"></span> Radar</span>
+                        <span class="legend-item"><span class="dot raid-dot"></span> Active Raid</span>
+                    </div>
+                </div>
+
+                <!-- Side Panel -->
+                <div id="side-panel">
+                    <!-- Tab Navigation -->
+                    <div id="panel-tabs">
+                        <button class="tab-btn active" data-tab="overview">Overview</button>
+                        <button class="tab-btn" data-tab="squadrons">Squadrons</button>
+                        <button class="tab-btn" data-tab="orders">Orders</button>
+                        <button class="tab-btn" data-tab="intel">Intel</button>
+                    </div>
+
+                    <!-- Overview Tab -->
+                    <div id="tab-overview" class="tab-content active">
+                        <div class="stats-grid">
+                            <div class="stat-card raf-card">
+                                <h3>RAF Fighter Command</h3>
+                                <div class="stat-row">
+                                    <span>Squadrons</span>
+                                    <span id="raf-squadrons">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Aircraft Ready</span>
+                                    <span id="raf-aircraft-ready">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Aircraft Total</span>
+                                    <span id="raf-aircraft-total">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Pilots Available</span>
+                                    <span id="raf-pilots">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Radar Stations</span>
+                                    <span id="raf-radar">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Airfields Operational</span>
+                                    <span id="raf-airfields">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-card lw-card">
+                                <h3>Luftwaffe</h3>
+                                <div class="stat-row">
+                                    <span>Units</span>
+                                    <span id="lw-squadrons">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Aircraft Ready</span>
+                                    <span id="lw-aircraft-ready">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Aircraft Total</span>
+                                    <span id="lw-aircraft-total">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>Pilots Available</span>
+                                    <span id="lw-pilots">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-card losses-card">
+                                <h3>Losses</h3>
+                                <div class="stat-row">
+                                    <span>RAF Fighters Lost</span>
+                                    <span id="raf-fighters-lost">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>RAF Pilots KIA</span>
+                                    <span id="raf-pilots-killed">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>LW Fighters Lost</span>
+                                    <span id="lw-fighters-lost">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>LW Bombers Lost</span>
+                                    <span id="lw-bombers-lost">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>LW Pilots KIA</span>
+                                    <span id="lw-pilots-killed">0</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>LW Pilots Captured</span>
+                                    <span id="lw-pilots-captured">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Squadrons Tab -->
+                    <div id="tab-squadrons" class="tab-content">
+                        <div class="filter-bar">
+                            <select id="sqn-filter-group">
+                                <option value="all">All Groups</option>
+                                <option value="10_group">10 Group</option>
+                                <option value="11_group">11 Group</option>
+                                <option value="12_group">12 Group</option>
+                                <option value="13_group">13 Group</option>
+                                <option value="luftflotte_2">Luftflotte 2</option>
+                                <option value="luftflotte_3">Luftflotte 3</option>
+                                <option value="luftflotte_5">Luftflotte 5</option>
+                            </select>
+                            <select id="sqn-filter-state">
+                                <option value="all">All States</option>
+                                <option value="ready">Ready</option>
+                                <option value="airborne">Airborne</option>
+                                <option value="rearming">Rearming</option>
+                            </select>
+                        </div>
+                        <div id="squadron-list" class="scrollable-list"></div>
+                    </div>
+
+                    <!-- Orders Tab -->
+                    <div id="tab-orders" class="tab-content">
+                        <div id="raf-orders" class="orders-section">
+                            <h3>Scramble Intercept</h3>
+                            <div class="order-form">
+                                <label>Squadron:</label>
+                                <select id="scramble-sqn"></select>
+                                <label>Target Raid:</label>
+                                <select id="scramble-raid">
+                                    <option value="">Patrol (no target)</option>
+                                </select>
+                                <button id="scramble-btn" class="action-btn">Scramble!</button>
+                            </div>
+                        </div>
+                        <div id="lw-orders" class="orders-section" style="display:none">
+                            <h3>Launch Raid</h3>
+                            <div class="order-form">
+                                <label>Bomber Units:</label>
+                                <select id="raid-bombers" multiple size="4"></select>
+                                <label>Escort Units:</label>
+                                <select id="raid-escorts" multiple size="3"></select>
+                                <label>Target:</label>
+                                <select id="raid-target"></select>
+                                <button id="launch-raid-btn" class="action-btn">Launch Raid!</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Intel Tab -->
+                    <div id="tab-intel" class="tab-content">
+                        <div id="event-log" class="scrollable-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/game.js"></script>
+</body>
+</html>
