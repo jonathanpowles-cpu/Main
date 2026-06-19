@@ -62,6 +62,23 @@ function init() {
     document.getElementById("pilot-sort").addEventListener("change", loadPilots);
     document.getElementById("pilot-aces-only").addEventListener("change", loadPilots);
 
+    document.getElementById("view-toggle").addEventListener("click", () => {
+        const mc = document.getElementById("main-content");
+        const btn = document.getElementById("view-toggle");
+        if (mc.classList.contains("view-map")) {
+            mc.classList.remove("view-map");
+            mc.classList.add("view-panel");
+            btn.textContent = "🗺️";
+        } else if (mc.classList.contains("view-panel")) {
+            mc.classList.remove("view-panel");
+            btn.textContent = "📋";
+        } else {
+            mc.classList.add("view-map");
+            btn.textContent = "📋";
+        }
+        resizeCanvas();
+    });
+
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 }

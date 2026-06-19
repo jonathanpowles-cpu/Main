@@ -670,3 +670,97 @@ body {
 }
 
 .mission-entry:nth-child(odd) { background: var(--bg-input); }
+
+/* View Toggle (tablet/mobile) */
+#view-toggle {
+    display: none;
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 50;
+    background: var(--raf-blue);
+    color: white;
+    border: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    font-family: inherit;
+}
+
+/* Tablet / iPad responsive */
+@media (max-width: 1024px) {
+    body { overflow: auto; height: auto; }
+
+    #top-bar {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 12px;
+        gap: 8px 16px;
+    }
+
+    .bar-controls {
+        width: 100%;
+        margin-left: 0;
+        justify-content: flex-end;
+        padding-top: 4px;
+        border-top: 1px solid var(--border);
+    }
+
+    #main-content {
+        flex-direction: column;
+        height: calc(100vh - 90px);
+        overflow: hidden;
+    }
+
+    #map-panel {
+        height: 45vh;
+        min-height: 250px;
+    }
+
+    #side-panel {
+        width: 100%;
+        min-width: unset;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .scrollable-list {
+        max-height: none;
+    }
+
+    #view-toggle { display: block; }
+
+    #main-content.view-map #side-panel { display: none; }
+    #main-content.view-map #map-panel { height: calc(100vh - 90px); }
+
+    #main-content.view-panel #map-panel { display: none; }
+    #main-content.view-panel #side-panel {
+        height: calc(100vh - 90px);
+        border-top: none;
+    }
+
+    .setup-container h1 { font-size: 2rem; letter-spacing: 0.15em; }
+    .side-select { flex-direction: column; }
+
+    .pilot-detail-panel {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 100;
+    }
+}
+
+/* Phone (small screens) */
+@media (max-width: 600px) {
+    #top-bar { padding: 6px 8px; gap: 4px 10px; }
+    .bar-section .label { display: none; }
+    .bar-section .value { font-size: 0.75rem; }
+    #panel-tabs { overflow-x: auto; }
+    .tab-btn { font-size: 0.65rem; padding: 8px 4px; white-space: nowrap; }
+    .setup-container { padding: 20px; }
+    .setup-container h1 { font-size: 1.5rem; }
+}
