@@ -1,0 +1,2344 @@
+{
+  "raf": {
+    "commanders": [
+      {
+        "name": "Hugh Dowding",
+        "rank": "Air Chief Marshal",
+        "role": "group_commander",
+        "unit": "fighter_command",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.95,
+        "traits": {
+          "aggression": 0.3,
+          "situational_awareness": 0.95,
+          "gunnery": 0.4,
+          "leadership": 0.92,
+          "tactical_sense": 0.95,
+          "coolness": 0.95
+        },
+        "historical_notes": "AOC Fighter Command. Architect of the integrated air defence system including radar and the Dowding System. Cautious strategist who husbanded fighter reserves during the French campaign."
+      },
+      {
+        "name": "Keith Park",
+        "rank": "Air Vice-Marshal",
+        "role": "group_commander",
+        "unit": "11_group",
+        "nationality": "new_zealander",
+        "kills_at_start": 0,
+        "experience": 0.93,
+        "traits": {
+          "aggression": 0.55,
+          "situational_awareness": 0.95,
+          "gunnery": 0.5,
+          "leadership": 0.95,
+          "tactical_sense": 0.95,
+          "coolness": 0.93
+        },
+        "historical_notes": "AOC 11 Group defending southeast England. WWI ace, close collaborator with Dowding. Personally flew his Hurricane to observe battles. Favoured squadron-strength interceptions to achieve rapid response."
+      },
+      {
+        "name": "Trafford Leigh-Mallory",
+        "rank": "Air Vice-Marshal",
+        "role": "group_commander",
+        "unit": "12_group",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.80,
+        "traits": {
+          "aggression": 0.75,
+          "situational_awareness": 0.70,
+          "gunnery": 0.4,
+          "leadership": 0.72,
+          "tactical_sense": 0.65,
+          "coolness": 0.70
+        },
+        "historical_notes": "AOC 12 Group covering the Midlands. Advocated Big Wing tactics with Bader. Controversial figure who clashed with Park over tactics and was accused of failing to protect 11 Group airfields."
+      },
+      {
+        "name": "Quintin Brand",
+        "rank": "Air Vice-Marshal",
+        "role": "group_commander",
+        "unit": "10_group",
+        "nationality": "south_african",
+        "kills_at_start": 0,
+        "experience": 0.80,
+        "traits": {
+          "aggression": 0.50,
+          "situational_awareness": 0.82,
+          "gunnery": 0.4,
+          "leadership": 0.80,
+          "tactical_sense": 0.80,
+          "coolness": 0.85
+        },
+        "historical_notes": "AOC 10 Group defending southwest England and South Wales. WWI veteran. Worked cooperatively with Park to coordinate 10 and 11 Group responses."
+      },
+      {
+        "name": "Richard Saul",
+        "rank": "Air Vice-Marshal",
+        "role": "group_commander",
+        "unit": "13_group",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.45,
+          "situational_awareness": 0.78,
+          "gunnery": 0.35,
+          "leadership": 0.78,
+          "tactical_sense": 0.75,
+          "coolness": 0.80
+        },
+        "historical_notes": "AOC 13 Group covering northern England and Scotland. Successfully repelled Luftflotte 5 raids from Scandinavia on 15 August 1940."
+      },
+      {
+        "name": "Cecil Grice",
+        "rank": "Group Captain",
+        "role": "sector_controller",
+        "unit": "biggin_hill",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.40,
+          "situational_awareness": 0.85,
+          "gunnery": 0.3,
+          "leadership": 0.80,
+          "tactical_sense": 0.82,
+          "coolness": 0.85
+        },
+        "historical_notes": "Sector Commander at Biggin Hill. Managed operations during the heaviest attacks on the sector station in late August/September 1940."
+      },
+      {
+        "name": "Victor Beamish",
+        "rank": "Wing Commander",
+        "role": "wing_commander",
+        "unit": "north_weald",
+        "nationality": "irish",
+        "kills_at_start": 2,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.85,
+          "gunnery": 0.72,
+          "leadership": 0.88,
+          "tactical_sense": 0.78,
+          "coolness": 0.80
+        },
+        "historical_notes": "Station Commander at North Weald. Known for personally flying combat sorties despite his rank. One of three Beamish brothers who all served as fighter pilots."
+      }
+    ],
+    "squadron_leaders": [
+      {
+        "name": "Peter Townsend",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "85_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.82,
+          "gunnery": 0.75,
+          "leadership": 0.85,
+          "tactical_sense": 0.80,
+          "coolness": 0.85
+        },
+        "historical_notes": "CO of 85 Squadron. Scored early victories including a He 111 over the North Sea in February 1940. Later became equerry to King George VI."
+      },
+      {
+        "name": "Adolph 'Sailor' Malan",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "74_sqn",
+        "nationality": "south_african",
+        "kills_at_start": 5,
+        "experience": 0.88,
+        "traits": {
+          "aggression": 0.75,
+          "situational_awareness": 0.90,
+          "gunnery": 0.92,
+          "leadership": 0.90,
+          "tactical_sense": 0.90,
+          "coolness": 0.92
+        },
+        "historical_notes": "CO of 74 Squadron. South African former merchant seaman. Already an ace by July 1940 from Dunkirk fighting. Authored the famous 'Ten Rules of Air Fighting'. One of the RAF's finest tacticians."
+      },
+      {
+        "name": "Douglas Bader",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "242_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.70,
+        "traits": {
+          "aggression": 0.95,
+          "situational_awareness": 0.78,
+          "gunnery": 0.75,
+          "leadership": 0.88,
+          "tactical_sense": 0.70,
+          "coolness": 0.80
+        },
+        "historical_notes": "CO of 242 Squadron (Canadian). Famous legless pilot who lost both legs in a 1931 crash. Forceful personality, champion of Big Wing tactics with Leigh-Mallory. No kills yet in July 1940."
+      },
+      {
+        "name": "Robert Stanford Tuck",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "92_sqn",
+        "nationality": "british",
+        "kills_at_start": 6,
+        "experience": 0.85,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.85,
+          "gunnery": 0.90,
+          "leadership": 0.80,
+          "tactical_sense": 0.82,
+          "coolness": 0.85
+        },
+        "historical_notes": "Ace from the Dunkirk fighting with 257 Sqn, taking over 92 Sqn during the Battle. Outstanding gunnery and deflection shooting skills. Charismatic and dashing figure."
+      },
+      {
+        "name": "John Thompson",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "111_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.80,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.80,
+          "gunnery": 0.78,
+          "leadership": 0.82,
+          "tactical_sense": 0.78,
+          "coolness": 0.80
+        },
+        "historical_notes": "CO of 111 Squadron, the first unit to receive Hurricanes. The squadron had developed early combat tactics and was highly experienced by July 1940."
+      },
+      {
+        "name": "Michael Crossley",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "32_sqn",
+        "nationality": "british",
+        "kills_at_start": 4,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.82,
+          "gunnery": 0.82,
+          "leadership": 0.78,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "CO of 32 Squadron at Biggin Hill. Scored victories over Dunkirk. Known as 'Red Knight' for his aggressive flying style."
+      },
+      {
+        "name": "Aeneas MacDonell",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "64_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.75,
+          "gunnery": 0.70,
+          "leadership": 0.78,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "CO of 64 Squadron at Kenley. Led the squadron through the intense summer fighting over Kent and the Channel."
+      },
+      {
+        "name": "George Darley",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "609_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.80,
+          "gunnery": 0.72,
+          "leadership": 0.82,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "CO of 609 (West Riding) Squadron, an Auxiliary Air Force unit. Led the squadron through intense combat over Warmwell and the Dorset coast."
+      },
+      {
+        "name": "James Leathart",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "54_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.85,
+          "gunnery": 0.78,
+          "leadership": 0.85,
+          "tactical_sense": 0.82,
+          "coolness": 0.88
+        },
+        "historical_notes": "CO of 54 Squadron at Hornchurch. Cool-headed leader who led his squadron through the Dunkirk fighting. Famously rescued a downed colleague from France in a two-seat Miles Master."
+      },
+      {
+        "name": "Tom Gleave",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "253_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.78,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 253 Squadron. Badly burned in combat in August 1940 and became a founding member of the Guinea Pig Club for burned airmen."
+      },
+      {
+        "name": "Harold Starr",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "245_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.62,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.68,
+          "gunnery": 0.65,
+          "leadership": 0.72,
+          "tactical_sense": 0.65,
+          "coolness": 0.70
+        },
+        "historical_notes": "CO of 245 Squadron based in Northern Ireland. The squadron was still working up to operational status in July 1940."
+      },
+      {
+        "name": "Harry Hogan",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "501_sqn",
+        "nationality": "british",
+        "kills_at_start": 4,
+        "experience": 0.80,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.80,
+          "gunnery": 0.75,
+          "leadership": 0.82,
+          "tactical_sense": 0.78,
+          "coolness": 0.80
+        },
+        "historical_notes": "CO of 501 (County of Gloucester) Squadron. Led the squadron in France and during Dunkirk, gaining significant combat experience."
+      },
+      {
+        "name": "John Peel",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "145_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.65,
+        "traits": {
+          "aggression": 0.58,
+          "situational_awareness": 0.70,
+          "gunnery": 0.65,
+          "leadership": 0.72,
+          "tactical_sense": 0.68,
+          "coolness": 0.72
+        },
+        "historical_notes": "CO of 145 Squadron. Led the squadron through early Channel convoy protection duties."
+      },
+      {
+        "name": "John Ellis",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "610_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.72,
+          "gunnery": 0.70,
+          "leadership": 0.75,
+          "tactical_sense": 0.70,
+          "coolness": 0.72
+        },
+        "historical_notes": "CO of 610 (County of Chester) Squadron at Biggin Hill. An Auxiliary Air Force squadron that saw heavy action in July-August."
+      },
+      {
+        "name": "John Worrall",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "32_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.75,
+          "gunnery": 0.72,
+          "leadership": 0.75,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Shared command duties at 32 Squadron. Experienced pilot who had served in France."
+      },
+      {
+        "name": "Peter Devitt",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "152_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.62,
+        "traits": {
+          "aggression": 0.55,
+          "situational_awareness": 0.68,
+          "gunnery": 0.62,
+          "leadership": 0.72,
+          "tactical_sense": 0.65,
+          "coolness": 0.72
+        },
+        "historical_notes": "CO of 152 Squadron at Warmwell. The squadron was relatively new to Spitfires in July 1940 but would see intense action defending Portland."
+      },
+      {
+        "name": "George Denholm",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "603_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.78,
+          "gunnery": 0.72,
+          "leadership": 0.80,
+          "tactical_sense": 0.75,
+          "coolness": 0.80
+        },
+        "historical_notes": "CO of 603 (City of Edinburgh) Squadron. The squadron had already scored the first kill over Britain in the war, downing a Ju 88 over the Firth of Forth in October 1939."
+      },
+      {
+        "name": "Sandy Johnstone",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "602_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.75,
+          "gunnery": 0.70,
+          "leadership": 0.80,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "CO of 602 (City of Glasgow) Squadron. Another Auxiliary Air Force unit that would move south during the Battle. Later wrote a detailed memoir."
+      },
+      {
+        "name": "Henry Fenton",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "238_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.75,
+          "tactical_sense": 0.68,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 238 Squadron at Middle Wallop. Led the squadron during convoy protection and early combat over the Channel."
+      },
+      {
+        "name": "John Grandy",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "249_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.65,
+        "traits": {
+          "aggression": 0.58,
+          "situational_awareness": 0.72,
+          "gunnery": 0.65,
+          "leadership": 0.78,
+          "tactical_sense": 0.68,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 249 Squadron, a newly formed unit working up to operational readiness. Would later rise to Marshal of the Royal Air Force."
+      },
+      {
+        "name": "James McComb",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "611_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.62,
+        "traits": {
+          "aggression": 0.55,
+          "situational_awareness": 0.68,
+          "gunnery": 0.62,
+          "leadership": 0.72,
+          "tactical_sense": 0.62,
+          "coolness": 0.72
+        },
+        "historical_notes": "CO of 611 (West Lancashire) Squadron at Digby. An Auxiliary Air Force Spitfire unit in 12 Group."
+      },
+      {
+        "name": "Marcus Robinson",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "601_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.75,
+          "gunnery": 0.70,
+          "leadership": 0.78,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "CO of 601 (County of London) Squadron at Tangmere. Known as the 'Millionaires Squadron' due to its wealthy Auxiliary members."
+      },
+      {
+        "name": "Edward Graham",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "72_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.75,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 72 Squadron at Acklington. The squadron would move south to Biggin Hill during the height of the Battle."
+      },
+      {
+        "name": "Philip Hunter",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "264_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.70,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.80,
+          "tactical_sense": 0.68,
+          "coolness": 0.78
+        },
+        "historical_notes": "CO of 264 Squadron, a Defiant unit. Had initial success at Dunkirk when German fighters mistook the turret-armed Defiants for Hurricanes. Killed in action August 1940."
+      },
+      {
+        "name": "Teddy Donaldson",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "151_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.78,
+          "gunnery": 0.78,
+          "leadership": 0.78,
+          "tactical_sense": 0.75,
+          "coolness": 0.80
+        },
+        "historical_notes": "CO of 151 Squadron at North Weald. Experienced pilot who had scored victories during the French campaign. Later became a post-war speed record holder."
+      },
+      {
+        "name": "John Dewar",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "87_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.70,
+          "situational_awareness": 0.78,
+          "gunnery": 0.75,
+          "leadership": 0.80,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "CO of 87 Squadron. The squadron had fought in France and was highly experienced but depleted. Based in the southwest with 10 Group."
+      },
+      {
+        "name": "Cedric Williams",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "17_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.75,
+          "tactical_sense": 0.68,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 17 Squadron at Debden. Led the squadron during early summer operations over the Channel."
+      },
+      {
+        "name": "Henry Sawyer",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "65_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.75,
+          "gunnery": 0.72,
+          "leadership": 0.75,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 65 Squadron at Hornchurch. The squadron operated Spitfires alongside 54 and 74 Squadrons from the busy Hornchurch sector."
+      },
+      {
+        "name": "Rupert Leigh",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "66_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.72,
+          "gunnery": 0.70,
+          "leadership": 0.75,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "CO of 66 Squadron at Coltishall. Would lead the squadron south during the height of the Battle to reinforce 11 Group."
+      },
+      {
+        "name": "Peter Townsend",
+        "rank": "Squadron Leader",
+        "role": "squadron_leader",
+        "unit": "79_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.75,
+          "gunnery": 0.72,
+          "leadership": 0.75,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "CO of 79 Squadron at Biggin Hill. Experienced leader who had fought over France during the spring campaign."
+      }
+    ],
+    "aces": [
+      {
+        "name": "Eric Lock",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "41_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.50,
+        "traits": {
+          "aggression": 0.90,
+          "situational_awareness": 0.78,
+          "gunnery": 0.92,
+          "leadership": 0.55,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Would become the highest-scoring British ace of the Battle of Britain with 26 confirmed kills. Still a novice in July 1940 but possessed extraordinary natural gunnery talent."
+      },
+      {
+        "name": "Brian Kingcome",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "92_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.70,
+          "situational_awareness": 0.85,
+          "gunnery": 0.80,
+          "leadership": 0.82,
+          "tactical_sense": 0.82,
+          "coolness": 0.90
+        },
+        "historical_notes": "Flight commander in 92 Squadron. Outstanding natural pilot known for his cool composure. Would effectively lead the squadron when CO was replaced."
+      },
+      {
+        "name": "Bob Doe",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "234_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.45,
+        "traits": {
+          "aggression": 0.85,
+          "situational_awareness": 0.82,
+          "gunnery": 0.88,
+          "leadership": 0.60,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Would become one of the top-scoring RAF aces with 14 confirmed kills during the Battle. A natural fighter pilot despite limited pre-war experience."
+      },
+      {
+        "name": "James 'Ginger' Lacey",
+        "rank": "Sergeant",
+        "role": "pilot",
+        "unit": "501_sqn",
+        "nationality": "british",
+        "kills_at_start": 5,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.88,
+          "gunnery": 0.90,
+          "leadership": 0.55,
+          "tactical_sense": 0.82,
+          "coolness": 0.82
+        },
+        "historical_notes": "NCO pilot who became the top-scoring RAF pilot of the Battle with 18 kills. Had already scored 5 kills over France with 501 Squadron. Gifted deflection shooter."
+      },
+      {
+        "name": "Archie McKellar",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "605_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.88,
+          "situational_awareness": 0.85,
+          "gunnery": 0.88,
+          "leadership": 0.72,
+          "tactical_sense": 0.80,
+          "coolness": 0.78
+        },
+        "historical_notes": "Scottish pilot who became one of the highest scorers of the Battle. Had scored early victories over Forth in 1939. Killed in action November 1940."
+      },
+      {
+        "name": "Colin Gray",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "54_sqn",
+        "nationality": "new_zealander",
+        "kills_at_start": 4,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.85,
+          "gunnery": 0.85,
+          "leadership": 0.62,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "New Zealander who had already scored kills over Dunkirk. Would become the top-scoring New Zealand ace. Flew with Al Deere at 54 Squadron."
+      },
+      {
+        "name": "Alan 'Al' Deere",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "54_sqn",
+        "nationality": "new_zealander",
+        "kills_at_start": 7,
+        "experience": 0.85,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.88,
+          "gunnery": 0.82,
+          "leadership": 0.78,
+          "tactical_sense": 0.85,
+          "coolness": 0.88
+        },
+        "historical_notes": "New Zealand ace who had scored 7 kills over Dunkirk. Legendary survivor who was shot down, crash-landed, and walked away from multiple incidents. Already a noted ace by July 1940."
+      },
+      {
+        "name": "James 'Johnnie' Johnson",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "616_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.35,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.70,
+          "leadership": 0.68,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "In July 1940 was a raw newcomer with no kills. Would go on to become the top-scoring Western Allied ace with 34 confirmed kills, but saw limited action in the Battle of Britain due to a shoulder injury."
+      },
+      {
+        "name": "Geoffrey Wellum",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "92_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.30,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.70,
+          "gunnery": 0.65,
+          "leadership": 0.45,
+          "tactical_sense": 0.62,
+          "coolness": 0.68
+        },
+        "historical_notes": "Joined 92 Squadron aged 18 as one of the youngest Spitfire pilots. Wrote the acclaimed memoir 'First Light'. A green pilot in July 1940 who would prove himself through the Battle."
+      },
+      {
+        "name": "Witold Urbanowicz",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "145_sqn",
+        "nationality": "polish",
+        "kills_at_start": 2,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.88,
+          "situational_awareness": 0.82,
+          "gunnery": 0.85,
+          "leadership": 0.75,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "Polish ace who had fought in September 1939. Initially posted to 145 Sqn before joining 303 Squadron. Would become commanding officer of 303 Sqn and score 15 kills in the Battle."
+      },
+      {
+        "name": "Josef Frantisek",
+        "rank": "Sergeant",
+        "role": "pilot",
+        "unit": "145_sqn",
+        "nationality": "czech",
+        "kills_at_start": 11,
+        "experience": 0.85,
+        "traits": {
+          "aggression": 0.98,
+          "situational_awareness": 0.80,
+          "gunnery": 0.92,
+          "leadership": 0.30,
+          "tactical_sense": 0.70,
+          "coolness": 0.65
+        },
+        "historical_notes": "Czech pilot who had fought in Poland and France, scoring 11 kills before arriving in Britain. Attached to 303 Squadron as a freelance fighter. Highest-scoring Allied ace of the Battle with 17 kills, but a lone wolf who ignored formation discipline. Killed October 1940."
+      },
+      {
+        "name": "Jan Zumbach",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "145_sqn",
+        "nationality": "polish",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.78,
+          "gunnery": 0.80,
+          "leadership": 0.65,
+          "tactical_sense": 0.75,
+          "coolness": 0.75
+        },
+        "historical_notes": "Polish pilot who had fought in September 1939. Would join 303 Squadron and score multiple kills. Later became a mercenary pilot in the Congo. Known for his Mickey Mouse personal emblem."
+      },
+      {
+        "name": "Karel Kuttelwascher",
+        "rank": "Sergeant",
+        "role": "pilot",
+        "unit": "1_sqn",
+        "nationality": "czech",
+        "kills_at_start": 3,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.82,
+          "gunnery": 0.85,
+          "leadership": 0.50,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "Czech pilot who had served in the French Air Force. Former pre-war Czech Air Force pilot. Would later become the RAF's top-scoring night intruder pilot."
+      },
+      {
+        "name": "Brendan 'Paddy' Finucane",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "65_sqn",
+        "nationality": "irish",
+        "kills_at_start": 0,
+        "experience": 0.40,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.78,
+          "gunnery": 0.82,
+          "leadership": 0.65,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Dublin-born pilot who joined the RAF in 1938. Still a novice in July 1940, would become one of the youngest wing commanders and a celebrated ace before being killed in 1942."
+      },
+      {
+        "name": "James 'Prof' Leathart",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "54_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.55,
+        "traits": {
+          "aggression": 0.60,
+          "situational_awareness": 0.72,
+          "gunnery": 0.70,
+          "leadership": 0.55,
+          "tactical_sense": 0.68,
+          "coolness": 0.72
+        },
+        "historical_notes": "One of the experienced pilots at 54 Squadron Hornchurch during the Dunkirk and early Battle of Britain fighting."
+      },
+      {
+        "name": "Robert 'Bobby' Oxspring",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "66_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.55,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.75,
+          "gunnery": 0.72,
+          "leadership": 0.60,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "Son of a WWI ace. Served throughout the Battle and later wrote 'Spitfire Command'. Would end the war with 11 confirmed kills."
+      },
+      {
+        "name": "Harbourne Stephen",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "74_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.80,
+          "gunnery": 0.78,
+          "leadership": 0.78,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "Flight commander in 74 Squadron under Sailor Malan. Experienced pilot who had scored kills over Dunkirk. Later commanded the squadron."
+      },
+      {
+        "name": "John Mungo-Park",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "74_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.65,
+        "traits": {
+          "aggression": 0.75,
+          "situational_awareness": 0.78,
+          "gunnery": 0.78,
+          "leadership": 0.62,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "Promising young pilot at 74 Squadron. Would become an ace during the Battle. Killed in action in 1941."
+      },
+      {
+        "name": "Tony Bartley",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "92_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.58,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.75,
+          "gunnery": 0.72,
+          "leadership": 0.60,
+          "tactical_sense": 0.68,
+          "coolness": 0.75
+        },
+        "historical_notes": "Pilot with 92 Squadron. Would become an ace during the Battle of Britain. Later married actress Deborah Kerr."
+      },
+      {
+        "name": "Keith Gillman",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "32_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.48,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.68,
+          "gunnery": 0.70,
+          "leadership": 0.45,
+          "tactical_sense": 0.62,
+          "coolness": 0.65
+        },
+        "historical_notes": "Pilot with 32 Squadron. Subject of the famous Daily Express photograph, shown running to his Hurricane. One of the iconic faces of the Battle."
+      }
+    ],
+    "notable_pilots": [
+      {
+        "name": "Denis David",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "87_sqn",
+        "nationality": "british",
+        "kills_at_start": 5,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.82,
+          "gunnery": 0.80,
+          "leadership": 0.65,
+          "tactical_sense": 0.78,
+          "coolness": 0.80
+        },
+        "historical_notes": "Had scored 5 kills during the French campaign with 87 Squadron. One of the most experienced Hurricane pilots in the RAF by July 1940."
+      },
+      {
+        "name": "Pete Brothers",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "32_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.70,
+          "situational_awareness": 0.78,
+          "gunnery": 0.75,
+          "leadership": 0.68,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Experienced pilot at 32 Squadron who had fought over France. Would become one of the long-serving aces who fought throughout the Battle."
+      },
+      {
+        "name": "Tom Neil",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "249_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.42,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.55,
+          "tactical_sense": 0.65,
+          "coolness": 0.72
+        },
+        "historical_notes": "Young pilot at 249 Squadron. Would score 13 kills during the Battle. Later wrote several acclaimed memoirs including 'Gun Button to Fire'."
+      },
+      {
+        "name": "George 'Grumpy' Unwin",
+        "rank": "Sergeant",
+        "role": "pilot",
+        "unit": "19_sqn",
+        "nationality": "british",
+        "kills_at_start": 3,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.82,
+          "gunnery": 0.80,
+          "leadership": 0.60,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "Experienced NCO pilot at 19 Squadron Duxford. Had scored kills over Dunkirk. One of the outstanding NCO pilots of the Battle."
+      },
+      {
+        "name": "Wallace 'Jock' Cunningham",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "19_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.78,
+          "gunnery": 0.72,
+          "leadership": 0.72,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "Flight commander at 19 Squadron. Experienced Spitfire pilot who had been with the unit since before the war."
+      },
+      {
+        "name": "Stanislaw Skalski",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "501_sqn",
+        "nationality": "polish",
+        "kills_at_start": 4,
+        "experience": 0.80,
+        "traits": {
+          "aggression": 0.85,
+          "situational_awareness": 0.82,
+          "gunnery": 0.85,
+          "leadership": 0.72,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "Poland's top-scoring ace who had shot down 4 German aircraft in September 1939. Initially served with 501 Squadron. Would become one of the leading Allied aces."
+      },
+      {
+        "name": "Boleslaw Gladych",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "1_sqn",
+        "nationality": "polish",
+        "kills_at_start": 2,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.90,
+          "situational_awareness": 0.72,
+          "gunnery": 0.78,
+          "leadership": 0.45,
+          "tactical_sense": 0.68,
+          "coolness": 0.68
+        },
+        "historical_notes": "Polish pilot who had fought in September 1939 and the French campaign. Known for extreme aggression and recklessness in combat."
+      },
+      {
+        "name": "John Dundas",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "609_sqn",
+        "nationality": "british",
+        "kills_at_start": 2,
+        "experience": 0.65,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.78,
+          "gunnery": 0.78,
+          "leadership": 0.60,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Journalist turned fighter pilot with 609 Squadron. Would shoot down Helmut Wick in November 1940 but was killed moments later by Wick's wingman."
+      },
+      {
+        "name": "David Crook",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "609_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.50,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.55,
+          "tactical_sense": 0.68,
+          "coolness": 0.72
+        },
+        "historical_notes": "Pilot with 609 Squadron who wrote one of the first published accounts of the Battle, 'Spitfire Pilot', in 1942. Killed on a photo reconnaissance mission in 1944."
+      },
+      {
+        "name": "Noel Agazarian",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "609_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.45,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.70,
+          "gunnery": 0.68,
+          "leadership": 0.50,
+          "tactical_sense": 0.65,
+          "coolness": 0.70
+        },
+        "historical_notes": "Young pilot at 609 Squadron. One of the squadron's promising newcomers who would see heavy action during the summer."
+      },
+      {
+        "name": "George Barclay",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "249_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.40,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.68,
+          "gunnery": 0.65,
+          "leadership": 0.55,
+          "tactical_sense": 0.62,
+          "coolness": 0.68
+        },
+        "historical_notes": "Young pilot at 249 Squadron who kept a detailed diary of the Battle. His journal provides one of the key primary sources for the period."
+      },
+      {
+        "name": "Charlton Haw",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "504_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.42,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.68,
+          "gunnery": 0.65,
+          "leadership": 0.50,
+          "tactical_sense": 0.62,
+          "coolness": 0.68
+        },
+        "historical_notes": "Yorkshire-born pilot who would score multiple victories during the Battle. One of the younger pilots who proved himself in combat."
+      },
+      {
+        "name": "Billy Drake",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "1_sqn",
+        "nationality": "british",
+        "kills_at_start": 4,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.80,
+          "gunnery": 0.80,
+          "leadership": 0.68,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "Had scored 4 kills in France with 1 Squadron. One of the experienced France veterans who formed the backbone of the RAF's fighter force in July 1940."
+      },
+      {
+        "name": "Richard Hillary",
+        "rank": "Pilot Officer",
+        "role": "pilot",
+        "unit": "603_sqn",
+        "nationality": "australian",
+        "kills_at_start": 0,
+        "experience": 0.38,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.68,
+          "gunnery": 0.62,
+          "leadership": 0.50,
+          "tactical_sense": 0.60,
+          "coolness": 0.62
+        },
+        "historical_notes": "Australian-born Oxford graduate who joined 603 Squadron. Shot down and badly burned in September 1940. Wrote 'The Last Enemy', the most famous memoir of the Battle. Killed in a training accident in 1943."
+      },
+      {
+        "name": "Frank Carey",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "43_sqn",
+        "nationality": "british",
+        "kills_at_start": 6,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.85,
+          "gunnery": 0.85,
+          "leadership": 0.72,
+          "tactical_sense": 0.82,
+          "coolness": 0.82
+        },
+        "historical_notes": "NCO-commissioned pilot who had scored 6 kills in France. One of the RAF's most experienced fighter pilots by July 1940. Rose from the ranks as a Halton apprentice."
+      },
+      {
+        "name": "Caesar Hull",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "43_sqn",
+        "nationality": "south_african",
+        "kills_at_start": 4,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.80,
+          "gunnery": 0.82,
+          "leadership": 0.72,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "South African pilot who was one of 43 Squadron's leading scorers. Had scored victories in France. Killed in action September 1940 after briefly commanding 43 Sqn."
+      },
+      {
+        "name": "James Nicolson",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "249_sqn",
+        "nationality": "british",
+        "kills_at_start": 0,
+        "experience": 0.55,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.65,
+          "gunnery": 0.72,
+          "leadership": 0.60,
+          "tactical_sense": 0.62,
+          "coolness": 0.85
+        },
+        "historical_notes": "Won the only Victoria Cross awarded to Fighter Command during the Battle. Despite being wounded and his aircraft on fire, continued attacking an enemy fighter before bailing out."
+      },
+      {
+        "name": "Bob Tuck",
+        "rank": "Flying Officer",
+        "role": "pilot",
+        "unit": "65_sqn",
+        "nationality": "british",
+        "kills_at_start": 1,
+        "experience": 0.55,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.72,
+          "gunnery": 0.72,
+          "leadership": 0.55,
+          "tactical_sense": 0.68,
+          "coolness": 0.72
+        },
+        "historical_notes": "Pilot at 65 Squadron, one of the Hornchurch-based Spitfire units. Experienced steady growth as a fighter pilot through the summer."
+      },
+      {
+        "name": "Pat Hughes",
+        "rank": "Flight Lieutenant",
+        "role": "pilot",
+        "unit": "234_sqn",
+        "nationality": "australian",
+        "kills_at_start": 2,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.85,
+          "situational_awareness": 0.80,
+          "gunnery": 0.82,
+          "leadership": 0.72,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Australian flight commander at 234 Squadron. Would become one of the top scorers before being killed in a collision with a Do 17 on 7 September 1940."
+      }
+    ]
+  },
+  "luftwaffe": {
+    "commanders": [
+      {
+        "name": "Albert Kesselring",
+        "rank": "Generalfeldmarschall",
+        "role": "group_commander",
+        "unit": "luftflotte_2",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.90,
+        "traits": {
+          "aggression": 0.75,
+          "situational_awareness": 0.80,
+          "gunnery": 0.3,
+          "leadership": 0.88,
+          "tactical_sense": 0.82,
+          "coolness": 0.85
+        },
+        "historical_notes": "Commander of Luftflotte 2 based in Belgium and northern France. Former artillery officer turned airman. Known as 'Smiling Albert'. Oversaw the main assault across the Channel narrows."
+      },
+      {
+        "name": "Hugo Sperrle",
+        "rank": "Generalfeldmarschall",
+        "role": "group_commander",
+        "unit": "luftflotte_3",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.85,
+        "traits": {
+          "aggression": 0.70,
+          "situational_awareness": 0.72,
+          "gunnery": 0.3,
+          "leadership": 0.78,
+          "tactical_sense": 0.75,
+          "coolness": 0.80
+        },
+        "historical_notes": "Commander of Luftflotte 3 based in western France. Had led the Condor Legion in Spain. Massive, imposing figure. His Luftflotte attacked from Normandy and Brittany."
+      },
+      {
+        "name": "Hans-Juergen Stumpff",
+        "rank": "Generaloberst",
+        "role": "group_commander",
+        "unit": "luftflotte_5",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.55,
+          "situational_awareness": 0.68,
+          "gunnery": 0.3,
+          "leadership": 0.72,
+          "tactical_sense": 0.65,
+          "coolness": 0.75
+        },
+        "historical_notes": "Commander of Luftflotte 5 in Norway and Denmark. His single major attack on northern England on 15 August 1940 was decisively repulsed, proving that no part of Britain could be attacked without cost."
+      },
+      {
+        "name": "Bruno Loerzer",
+        "rank": "General der Flieger",
+        "role": "group_commander",
+        "unit": "luftflotte_2",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.3,
+          "leadership": 0.72,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "Commander of II Fliegerkorps under Luftflotte 2. Close friend of Goering from WWI. Led bomber operations against southeast England."
+      },
+      {
+        "name": "Wolfram von Richthofen",
+        "rank": "Generalmajor",
+        "role": "group_commander",
+        "unit": "luftflotte_2",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.88,
+        "traits": {
+          "aggression": 0.85,
+          "situational_awareness": 0.82,
+          "gunnery": 0.3,
+          "leadership": 0.82,
+          "tactical_sense": 0.85,
+          "coolness": 0.78
+        },
+        "historical_notes": "Commander of VIII Fliegerkorps (Stuka units). Cousin of the Red Baron. Had perfected close air support tactics in Spain and Poland. Master of dive-bomber operations."
+      }
+    ],
+    "squadron_leaders": [
+      {
+        "name": "Werner Moelders",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "jg51",
+        "nationality": "german",
+        "kills_at_start": 25,
+        "experience": 0.98,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.95,
+          "gunnery": 0.95,
+          "leadership": 0.92,
+          "tactical_sense": 0.95,
+          "coolness": 0.92
+        },
+        "historical_notes": "Kommodore of JG 51. Had 14 kills from Spain with the Condor Legion and 11 more from France. Developed the Finger Four formation and rotte/schwarm tactics that revolutionized fighter combat. The Luftwaffe's leading ace in July 1940."
+      },
+      {
+        "name": "Adolf Galland",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 17,
+        "experience": 0.95,
+        "traits": {
+          "aggression": 0.88,
+          "situational_awareness": 0.92,
+          "gunnery": 0.92,
+          "leadership": 0.90,
+          "tactical_sense": 0.90,
+          "coolness": 0.90
+        },
+        "historical_notes": "Kommodore of JG 26 Schlageter. Had scored 17 kills in France. Flamboyant, cigar-smoking leader who became Germany's youngest General. When Goering asked what he needed, famously replied 'Spitfires'."
+      },
+      {
+        "name": "Helmut Wick",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg2",
+        "nationality": "german",
+        "kills_at_start": 14,
+        "experience": 0.88,
+        "traits": {
+          "aggression": 0.92,
+          "situational_awareness": 0.85,
+          "gunnery": 0.88,
+          "leadership": 0.72,
+          "tactical_sense": 0.78,
+          "coolness": 0.72
+        },
+        "historical_notes": "Kommandeur of I./JG 2, would become Kommodore. Had 14 kills from France. Extremely aggressive pilot who sought to become top ace. Shot down and killed by John Dundas in November 1940 with 56 kills."
+      },
+      {
+        "name": "Guenther Luetzow",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "jg3",
+        "nationality": "german",
+        "kills_at_start": 15,
+        "experience": 0.90,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.88,
+          "gunnery": 0.85,
+          "leadership": 0.88,
+          "tactical_sense": 0.85,
+          "coolness": 0.88
+        },
+        "historical_notes": "Kommodore of JG 3. Condor Legion veteran with 5 kills from Spain. Well-respected leader and tactical thinker. One of the few who dared to criticize Goering's leadership."
+      },
+      {
+        "name": "Hannes Trautloft",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "jg54",
+        "nationality": "german",
+        "kills_at_start": 9,
+        "experience": 0.88,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.85,
+          "gunnery": 0.82,
+          "leadership": 0.90,
+          "tactical_sense": 0.85,
+          "coolness": 0.88
+        },
+        "historical_notes": "Kommodore of JG 54 Grunherz. Condor Legion veteran with 5 kills from Spain. Known as a thoughtful and caring leader who prioritized his men's welfare over personal glory."
+      },
+      {
+        "name": "Walter Oesau",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg51",
+        "nationality": "german",
+        "kills_at_start": 20,
+        "experience": 0.92,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.88,
+          "gunnery": 0.90,
+          "leadership": 0.78,
+          "tactical_sense": 0.85,
+          "coolness": 0.82
+        },
+        "historical_notes": "Kommandeur of III./JG 51. Condor Legion veteran with 8 kills from Spain and 12 more from France. One of only 3 pilots to receive the Spanish Cross in Gold with Diamonds."
+      },
+      {
+        "name": "Hennig Struempell",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "kg2",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.55,
+          "leadership": 0.78,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "Kommodore of KG 2. Led bomber operations over southeast England with Do 17 aircraft."
+      },
+      {
+        "name": "Joachim Huth",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "zg76",
+        "nationality": "german",
+        "kills_at_start": 3,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.75,
+          "gunnery": 0.70,
+          "leadership": 0.78,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "Kommodore of ZG 76. Led the Bf 110 Zerstorer unit that suffered heavy losses when the twin-engined fighters proved vulnerable to Spitfires and Hurricanes."
+      },
+      {
+        "name": "Hans von Hahn",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "jg3",
+        "nationality": "german",
+        "kills_at_start": 5,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.78,
+          "gunnery": 0.75,
+          "leadership": 0.78,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Gruppe Kommandeur in JG 3. Experienced pilot who had fought in Spain and the French campaign."
+      },
+      {
+        "name": "Harry von Buelow-Bothkamp",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg2",
+        "nationality": "german",
+        "kills_at_start": 6,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.70,
+          "situational_awareness": 0.78,
+          "gunnery": 0.75,
+          "leadership": 0.75,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Gruppe Kommandeur in JG 2. Descendant of a prominent military family. Experienced pilot who led from the front."
+      },
+      {
+        "name": "Gotthard Handrick",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 2,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.55,
+          "situational_awareness": 0.72,
+          "gunnery": 0.68,
+          "leadership": 0.72,
+          "tactical_sense": 0.68,
+          "coolness": 0.78
+        },
+        "historical_notes": "Outgoing Kommodore of JG 26, replaced by Galland during the Battle. Olympic gold medallist in modern pentathlon at the 1936 Berlin Olympics."
+      },
+      {
+        "name": "Hans-Juergen von Cramon-Taubadel",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 4,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.75,
+          "gunnery": 0.72,
+          "leadership": 0.75,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Gruppe Kommandeur in JG 27. Led his unit during the Channel battles and attacks on southern England."
+      },
+      {
+        "name": "Max Ibel",
+        "rank": "Oberst",
+        "role": "geschwader_kommodore",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 1,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.55,
+          "situational_awareness": 0.75,
+          "gunnery": 0.65,
+          "leadership": 0.82,
+          "tactical_sense": 0.78,
+          "coolness": 0.82
+        },
+        "historical_notes": "Kommodore of JG 27. Experienced officer who had led the Geschwader through the French campaign. Later became a Jafue (fighter leader)."
+      },
+      {
+        "name": "Werner Junck",
+        "rank": "Oberst",
+        "role": "geschwader_kommodore",
+        "unit": "jg53",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.58,
+          "situational_awareness": 0.72,
+          "gunnery": 0.60,
+          "leadership": 0.78,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "Kommodore of JG 53 Pik As (Ace of Spades). WWI veteran who led the Geschwader from Brittany against southwestern England approaches."
+      },
+      {
+        "name": "Walter Rubensdoerffer",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "erpgr210",
+        "nationality": "german",
+        "kills_at_start": 4,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.80,
+          "gunnery": 0.78,
+          "leadership": 0.80,
+          "tactical_sense": 0.80,
+          "coolness": 0.78
+        },
+        "historical_notes": "Commander of Erprobungsgruppe 210, the precision fighter-bomber unit. Led daring low-level attacks on radar stations and airfields. Killed in action August 1940 during an attack on Croydon."
+      },
+      {
+        "name": "Johannes Fink",
+        "rank": "Oberst",
+        "role": "geschwader_kommodore",
+        "unit": "kg2",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.78,
+          "gunnery": 0.55,
+          "leadership": 0.85,
+          "tactical_sense": 0.80,
+          "coolness": 0.82
+        },
+        "historical_notes": "Appointed Kanalkampffuehrer (Channel Battle Leader) to coordinate attacks on Channel convoys. Experienced bomber commander who oversaw the early phase of the Battle."
+      },
+      {
+        "name": "Paul Weitkus",
+        "rank": "Major",
+        "role": "geschwader_kommodore",
+        "unit": "kg3",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.72,
+          "gunnery": 0.55,
+          "leadership": 0.75,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "Kommodore of KG 3 Blitz. Led Do 17 bomber operations from Belgium against targets in southeast England."
+      }
+    ],
+    "aces": [
+      {
+        "name": "Gerhard Schoepfel",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 12,
+        "experience": 0.88,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.90,
+          "gunnery": 0.88,
+          "leadership": 0.78,
+          "tactical_sense": 0.88,
+          "coolness": 0.85
+        },
+        "historical_notes": "Kommandeur of III./JG 26. On 18 August shot down 4 Hurricanes from 501 Squadron in under 5 minutes without being seen, one of the most remarkable individual feats of the Battle."
+      },
+      {
+        "name": "Josef 'Pips' Priller",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg51",
+        "nationality": "german",
+        "kills_at_start": 6,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.88,
+          "situational_awareness": 0.80,
+          "gunnery": 0.82,
+          "leadership": 0.72,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Staffelkapitan in JG 51. Aggressive pilot who would become one of the Luftwaffe's leading aces. Later famously made a solo strafing run over Normandy beaches on D-Day."
+      },
+      {
+        "name": "Hans-Karl Mayer",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg53",
+        "nationality": "german",
+        "kills_at_start": 14,
+        "experience": 0.85,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.85,
+          "gunnery": 0.88,
+          "leadership": 0.68,
+          "tactical_sense": 0.82,
+          "coolness": 0.78
+        },
+        "historical_notes": "Staffelkapitan in JG 53 Pik As. One of the highest-scoring pilots by July 1940 with 14 kills from the French campaign. Killed in action October 1940."
+      },
+      {
+        "name": "Werner Bartels",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 7,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.80,
+          "gunnery": 0.80,
+          "leadership": 0.65,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "Staffelkapitan in JG 27. Experienced pilot with victories from the French campaign."
+      },
+      {
+        "name": "Heinz Baer",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg51",
+        "nationality": "german",
+        "kills_at_start": 4,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.82,
+          "gunnery": 0.88,
+          "leadership": 0.55,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "Young pilot in JG 51 who would become one of the Luftwaffe's greatest aces with 220 victories. Still relatively junior in July 1940 but showed exceptional talent."
+      },
+      {
+        "name": "Gustav 'Micky' Sprick",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 8,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.78,
+          "gunnery": 0.82,
+          "leadership": 0.68,
+          "tactical_sense": 0.75,
+          "coolness": 0.75
+        },
+        "historical_notes": "Staffelkapitan in JG 26. Scored victories during the French campaign. Killed in action June 1941 with 31 kills."
+      },
+      {
+        "name": "Joachim Muencheberg",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 7,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.82,
+          "situational_awareness": 0.85,
+          "gunnery": 0.85,
+          "leadership": 0.72,
+          "tactical_sense": 0.80,
+          "coolness": 0.82
+        },
+        "historical_notes": "Staffelkapitan of 7./JG 26. One of Galland's most talented subordinates. Outstanding pilot who would score heavily during the Battle. Killed in action 1943 with 135 kills."
+      },
+      {
+        "name": "Adolf 'Dolfo' Galland",
+        "rank": "Oberleutnant",
+        "role": "pilot",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 3,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.78,
+          "gunnery": 0.80,
+          "leadership": 0.55,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Not to be confused with the Kommodore - this represents other JG 26 pilots contributing to the unit's formidable fighting strength during the Battle."
+      },
+      {
+        "name": "Erich Schmidt",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg53",
+        "nationality": "german",
+        "kills_at_start": 4,
+        "experience": 0.68,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.75,
+          "gunnery": 0.82,
+          "leadership": 0.50,
+          "tactical_sense": 0.72,
+          "coolness": 0.72
+        },
+        "historical_notes": "Pilot in JG 53 Pik As. Scored victories during the French campaign and would continue scoring during the Channel battles."
+      },
+      {
+        "name": "Horst Tietzen",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg51",
+        "nationality": "german",
+        "kills_at_start": 12,
+        "experience": 0.82,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.82,
+          "gunnery": 0.85,
+          "leadership": 0.68,
+          "tactical_sense": 0.78,
+          "coolness": 0.78
+        },
+        "historical_notes": "Staffelkapitan in JG 51. Highly experienced pilot with 12 kills from France. Killed in action August 1940 with 20 total kills."
+      },
+      {
+        "name": "Herbert Ihlefeld",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "lg2",
+        "nationality": "german",
+        "kills_at_start": 15,
+        "experience": 0.90,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.88,
+          "gunnery": 0.88,
+          "leadership": 0.80,
+          "tactical_sense": 0.85,
+          "coolness": 0.85
+        },
+        "historical_notes": "Kommandeur of I.(J)/LG 2. Condor Legion veteran with 7 kills from Spain. One of the most experienced fighter pilots in the Luftwaffe. Would end the war with 130 kills."
+      },
+      {
+        "name": "Wolfgang Lippert",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 6,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.78,
+          "gunnery": 0.78,
+          "leadership": 0.75,
+          "tactical_sense": 0.75,
+          "coolness": 0.78
+        },
+        "historical_notes": "Kommandeur of II./JG 27. Experienced Gruppe leader who fought over the Channel. Later transferred to North Africa where he was killed in action in 1941."
+      },
+      {
+        "name": "Eduard Neumann",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 3,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.80,
+          "gunnery": 0.72,
+          "leadership": 0.85,
+          "tactical_sense": 0.80,
+          "coolness": 0.85
+        },
+        "historical_notes": "Kommandeur of I./JG 27. Known more as an outstanding leader and mentor than an ace scorer. Would later command JG 27 in North Africa and mentor Hans-Joachim Marseille."
+      },
+      {
+        "name": "Wilhelm Balthasar",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg3",
+        "nationality": "german",
+        "kills_at_start": 23,
+        "experience": 0.92,
+        "traits": {
+          "aggression": 0.88,
+          "situational_awareness": 0.85,
+          "gunnery": 0.90,
+          "leadership": 0.72,
+          "tactical_sense": 0.82,
+          "coolness": 0.78
+        },
+        "historical_notes": "Kommandeur of III./JG 3. Had scored heavily in France, including kills while flying with JG 1 and JG 27. One of the highest-scoring pilots at the start of the Battle."
+      },
+      {
+        "name": "Rolf Pingel",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 12,
+        "experience": 0.85,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.82,
+          "gunnery": 0.85,
+          "leadership": 0.75,
+          "tactical_sense": 0.80,
+          "coolness": 0.80
+        },
+        "historical_notes": "Kommandeur of I./JG 26. Experienced pilot with 12 kills from Spain and France. Captured when shot down over England in July 1941."
+      }
+    ],
+    "notable_pilots": [
+      {
+        "name": "Werner Schroer",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 1,
+        "experience": 0.55,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.75,
+          "gunnery": 0.78,
+          "leadership": 0.55,
+          "tactical_sense": 0.70,
+          "coolness": 0.75
+        },
+        "historical_notes": "Young pilot in JG 27. Would go on to become a major ace with 114 victories, mostly in North Africa and the Mediterranean."
+      },
+      {
+        "name": "Hans Philipp",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg54",
+        "nationality": "german",
+        "kills_at_start": 6,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.75,
+          "situational_awareness": 0.82,
+          "gunnery": 0.85,
+          "leadership": 0.72,
+          "tactical_sense": 0.80,
+          "coolness": 0.82
+        },
+        "historical_notes": "Staffelkapitan in JG 54 Grunherz. Had scored victories in France. Would become a high-scoring ace on the Eastern Front before being killed by P-47s in 1943 with 206 kills."
+      },
+      {
+        "name": "Dietrich Hrabak",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg54",
+        "nationality": "german",
+        "kills_at_start": 5,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.82,
+          "gunnery": 0.78,
+          "leadership": 0.80,
+          "tactical_sense": 0.80,
+          "coolness": 0.85
+        },
+        "historical_notes": "Staffelkapitan in JG 54. Known for his careful, calculated approach to combat. Would end the war as a Geschwader Kommodore with 125 kills and an outstanding survival record."
+      },
+      {
+        "name": "Friedrich 'Fritz' Geisshardt",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 3,
+        "experience": 0.62,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.72,
+          "gunnery": 0.78,
+          "leadership": 0.50,
+          "tactical_sense": 0.68,
+          "coolness": 0.72
+        },
+        "historical_notes": "Pilot in JG 26. One of the unit's competent younger pilots who would score steadily through the Battle."
+      },
+      {
+        "name": "Werner Machold",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg2",
+        "nationality": "german",
+        "kills_at_start": 8,
+        "experience": 0.78,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.78,
+          "gunnery": 0.82,
+          "leadership": 0.65,
+          "tactical_sense": 0.75,
+          "coolness": 0.75
+        },
+        "historical_notes": "Staffelkapitan in JG 2 Richthofen. Experienced pilot who had scored 8 kills in France. Continued scoring through the Battle of Britain."
+      },
+      {
+        "name": "Egon Mayer",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg2",
+        "nationality": "german",
+        "kills_at_start": 2,
+        "experience": 0.58,
+        "traits": {
+          "aggression": 0.78,
+          "situational_awareness": 0.75,
+          "gunnery": 0.80,
+          "leadership": 0.55,
+          "tactical_sense": 0.75,
+          "coolness": 0.72
+        },
+        "historical_notes": "Young pilot in JG 2 who would become a leading ace. Later pioneered the head-on attack against American heavy bombers. Killed in action March 1944 with 102 kills."
+      },
+      {
+        "name": "Karl-Heinz Leesmann",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg52",
+        "nationality": "german",
+        "kills_at_start": 7,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.78,
+          "gunnery": 0.78,
+          "leadership": 0.68,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Staffelkapitan in JG 52. One of the experienced pilots who led Staffel-level operations during the Channel and airfield attack phases."
+      },
+      {
+        "name": "Ulrich Steinhilper",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg52",
+        "nationality": "german",
+        "kills_at_start": 2,
+        "experience": 0.58,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.72,
+          "leadership": 0.50,
+          "tactical_sense": 0.68,
+          "coolness": 0.70
+        },
+        "historical_notes": "Pilot in JG 52. Shot down and captured in October 1940. Later wrote 'Spitfire on My Tail', providing the German pilot's perspective on the Battle."
+      },
+      {
+        "name": "Erhard Braune",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg27",
+        "nationality": "german",
+        "kills_at_start": 5,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.75,
+          "gunnery": 0.78,
+          "leadership": 0.68,
+          "tactical_sense": 0.72,
+          "coolness": 0.75
+        },
+        "historical_notes": "Staffelkapitan in JG 27. Experienced pilot from the French campaign who led his Staffel during the Channel battles."
+      },
+      {
+        "name": "Otto Bertram",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "kg77",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.65,
+          "situational_awareness": 0.72,
+          "gunnery": 0.55,
+          "leadership": 0.75,
+          "tactical_sense": 0.70,
+          "coolness": 0.78
+        },
+        "historical_notes": "Gruppe Kommandeur in KG 77. Led Ju 88 bomber operations against targets in southern England."
+      },
+      {
+        "name": "Helmut Bode",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "kg76",
+        "nationality": "german",
+        "kills_at_start": 0,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.62,
+          "situational_awareness": 0.72,
+          "gunnery": 0.55,
+          "leadership": 0.75,
+          "tactical_sense": 0.68,
+          "coolness": 0.78
+        },
+        "historical_notes": "Gruppe Kommandeur in KG 76. Led Do 17 bomber operations. KG 76 was involved in some of the most heavily contested bombing raids of the Battle."
+      },
+      {
+        "name": "Johannes Steinhoff",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg52",
+        "nationality": "german",
+        "kills_at_start": 4,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.82,
+          "gunnery": 0.78,
+          "leadership": 0.82,
+          "tactical_sense": 0.80,
+          "coolness": 0.85
+        },
+        "historical_notes": "Staffelkapitan in JG 52. Thoughtful and philosophical pilot. Would end the war with 176 kills and go on to help rebuild the post-war German Air Force."
+      },
+      {
+        "name": "Guenther Rall",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg52",
+        "nationality": "german",
+        "kills_at_start": 1,
+        "experience": 0.50,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.75,
+          "gunnery": 0.78,
+          "leadership": 0.55,
+          "tactical_sense": 0.72,
+          "coolness": 0.72
+        },
+        "historical_notes": "Young pilot in JG 52. Saw limited action in the Battle of Britain. Would become the third highest-scoring ace in history with 275 kills, almost all on the Eastern Front."
+      },
+      {
+        "name": "Erich Rudorffer",
+        "rank": "Leutnant",
+        "role": "pilot",
+        "unit": "jg2",
+        "nationality": "german",
+        "kills_at_start": 4,
+        "experience": 0.65,
+        "traits": {
+          "aggression": 0.80,
+          "situational_awareness": 0.78,
+          "gunnery": 0.85,
+          "leadership": 0.50,
+          "tactical_sense": 0.75,
+          "coolness": 0.72
+        },
+        "historical_notes": "Pilot in JG 2 Richthofen. Would become one of the Luftwaffe's great aces with 222 kills, and once shot down 13 Soviet aircraft in a single mission."
+      },
+      {
+        "name": "Walter Adolph",
+        "rank": "Oberleutnant",
+        "role": "staffel_kapitan",
+        "unit": "jg26",
+        "nationality": "german",
+        "kills_at_start": 5,
+        "experience": 0.72,
+        "traits": {
+          "aggression": 0.72,
+          "situational_awareness": 0.75,
+          "gunnery": 0.78,
+          "leadership": 0.68,
+          "tactical_sense": 0.72,
+          "coolness": 0.72
+        },
+        "historical_notes": "Staffelkapitan in JG 26 Schlageter. Experienced pilot from the French campaign. Killed in action September 1941 with 28 kills."
+      },
+      {
+        "name": "Ignaz Prestele",
+        "rank": "Hauptmann",
+        "role": "gruppe_kommandeur",
+        "unit": "jg51",
+        "nationality": "german",
+        "kills_at_start": 5,
+        "experience": 0.75,
+        "traits": {
+          "aggression": 0.68,
+          "situational_awareness": 0.75,
+          "gunnery": 0.75,
+          "leadership": 0.75,
+          "tactical_sense": 0.72,
+          "coolness": 0.78
+        },
+        "historical_notes": "Gruppe Kommandeur in JG 51 under Moelders. Experienced Gruppe leader who managed day-to-day combat operations."
+      }
+    ]
+  }
+}

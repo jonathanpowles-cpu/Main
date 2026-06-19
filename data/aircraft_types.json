@@ -14,7 +14,28 @@
     "fuel_capacity_gallons": 85,
     "fuel_burn_per_hour": 45,
     "crew": 1,
-    "production_per_week": 8
+    "production_per_week": 8,
+    "combat": {
+      "turn_rate": 9,
+      "roll_rate": 7,
+      "dive_speed_mph": 450,
+      "zoom_climb": 7,
+      "high_alt_modifier": 0.9,
+      "low_alt_modifier": 0.85,
+      "optimal_alt_ft": 20000,
+      "armament_type": "mg_battery",
+      "burst_mass_lbs_sec": 1.4,
+      "ammo_seconds": 14,
+      "lethal_burst_sec": 2.0,
+      "convergence_range_yds": 250,
+      "effective_range_yds": 300,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.65,
+      "gun_platform_stability": 0.85,
+      "structural_g_limit": 9.0,
+      "bounce_vulnerability": 0.35,
+      "notes": "Best turning fighter in the battle. Weak against negative-G escape. Carburettor floods in negative G — cannot follow Bf 109 in a bunt. Excellent at medium-high altitude."
+    }
   },
   "spitfire_mk2": {
     "name": "Supermarine Spitfire Mk II",
@@ -31,7 +52,28 @@
     "fuel_capacity_gallons": 85,
     "fuel_burn_per_hour": 47,
     "crew": 1,
-    "production_per_week": 5
+    "production_per_week": 5,
+    "combat": {
+      "turn_rate": 9,
+      "roll_rate": 7,
+      "dive_speed_mph": 460,
+      "zoom_climb": 8,
+      "high_alt_modifier": 0.92,
+      "low_alt_modifier": 0.87,
+      "optimal_alt_ft": 22000,
+      "armament_type": "mg_battery",
+      "burst_mass_lbs_sec": 1.4,
+      "ammo_seconds": 14,
+      "lethal_burst_sec": 2.0,
+      "convergence_range_yds": 250,
+      "effective_range_yds": 300,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.65,
+      "gun_platform_stability": 0.85,
+      "structural_g_limit": 9.0,
+      "bounce_vulnerability": 0.33,
+      "notes": "Improved Merlin XII engine gives better climb and ceiling. Same armament limitations as Mk I."
+    }
   },
   "hurricane_mk1": {
     "name": "Hawker Hurricane Mk I",
@@ -48,7 +90,28 @@
     "fuel_capacity_gallons": 97,
     "fuel_burn_per_hour": 48,
     "crew": 1,
-    "production_per_week": 12
+    "production_per_week": 12,
+    "combat": {
+      "turn_rate": 7,
+      "roll_rate": 6,
+      "dive_speed_mph": 380,
+      "zoom_climb": 5,
+      "high_alt_modifier": 0.7,
+      "low_alt_modifier": 0.95,
+      "optimal_alt_ft": 15000,
+      "armament_type": "mg_battery",
+      "burst_mass_lbs_sec": 1.4,
+      "ammo_seconds": 14,
+      "lethal_burst_sec": 2.0,
+      "convergence_range_yds": 250,
+      "effective_range_yds": 300,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.7,
+      "gun_platform_stability": 0.92,
+      "structural_g_limit": 8.0,
+      "bounce_vulnerability": 0.3,
+      "notes": "Superb gun platform — wide-track undercarriage and thick wing make it steady in a firing pass. Fabric-covered fuselage absorbs bullets without fragmenting. Ideal bomber destroyer. Outclassed by Bf 109 at altitude but holds its own below 15,000ft."
+    }
   },
   "blenheim_if": {
     "name": "Bristol Blenheim Mk IF",
@@ -65,7 +128,28 @@
     "fuel_capacity_gallons": 278,
     "fuel_burn_per_hour": 60,
     "crew": 2,
-    "production_per_week": 3
+    "production_per_week": 3,
+    "combat": {
+      "turn_rate": 3,
+      "roll_rate": 3,
+      "dive_speed_mph": 320,
+      "zoom_climb": 3,
+      "high_alt_modifier": 0.5,
+      "low_alt_modifier": 0.8,
+      "optimal_alt_ft": 12000,
+      "armament_type": "mg_mixed",
+      "burst_mass_lbs_sec": 0.9,
+      "ammo_seconds": 12,
+      "lethal_burst_sec": 3.0,
+      "convergence_range_yds": 300,
+      "effective_range_yds": 350,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.5,
+      "gun_platform_stability": 0.7,
+      "structural_g_limit": 5.0,
+      "bounce_vulnerability": 0.5,
+      "notes": "Too slow for day fighter ops. Early AI radar sets gave limited night interception capability."
+    }
   },
   "defiant_mk1": {
     "name": "Boulton Paul Defiant Mk I",
@@ -82,7 +166,28 @@
     "fuel_capacity_gallons": 95,
     "fuel_burn_per_hour": 50,
     "crew": 2,
-    "production_per_week": 2
+    "production_per_week": 2,
+    "combat": {
+      "turn_rate": 4,
+      "roll_rate": 4,
+      "dive_speed_mph": 350,
+      "zoom_climb": 3,
+      "high_alt_modifier": 0.55,
+      "low_alt_modifier": 0.8,
+      "optimal_alt_ft": 15000,
+      "armament_type": "turret_mg",
+      "burst_mass_lbs_sec": 0.6,
+      "ammo_seconds": 14,
+      "lethal_burst_sec": 3.5,
+      "convergence_range_yds": 200,
+      "effective_range_yds": 250,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.6,
+      "gun_platform_stability": 0.6,
+      "structural_g_limit": 6.0,
+      "bounce_vulnerability": 0.5,
+      "notes": "Turret fighter concept failed against fighters. Mistaken for Hurricanes initially, suffered devastating losses once Luftwaffe identified them. Effective only in surprise attacks from below."
+    }
   },
   "bf109e": {
     "name": "Messerschmitt Bf 109 E-4",
@@ -99,7 +204,28 @@
     "fuel_capacity_gallons": 88,
     "fuel_burn_per_hour": 52,
     "crew": 1,
-    "production_per_week": 10
+    "production_per_week": 10,
+    "combat": {
+      "turn_rate": 7,
+      "roll_rate": 8,
+      "dive_speed_mph": 470,
+      "zoom_climb": 9,
+      "high_alt_modifier": 0.95,
+      "low_alt_modifier": 0.8,
+      "optimal_alt_ft": 22000,
+      "armament_type": "cannon_mg_mix",
+      "burst_mass_lbs_sec": 2.8,
+      "ammo_seconds": 7,
+      "lethal_burst_sec": 1.0,
+      "convergence_range_yds": 200,
+      "effective_range_yds": 250,
+      "fuel_injection": true,
+      "cockpit_visibility": 0.55,
+      "gun_platform_stability": 0.7,
+      "structural_g_limit": 9.0,
+      "bounce_vulnerability": 0.4,
+      "notes": "Best boom-and-zoom fighter. Fuel injection allows negative-G escape (push-over dive) that carburettor-equipped RAF fighters cannot follow. 20mm cannon devastating but only 60 RPG — encourages hit-and-run tactics. Critical weakness: only ~10 minutes combat fuel over London, forcing premature disengagement."
+    }
   },
   "bf110c": {
     "name": "Messerschmitt Bf 110 C",
@@ -116,7 +242,28 @@
     "fuel_capacity_gallons": 260,
     "fuel_burn_per_hour": 80,
     "crew": 2,
-    "production_per_week": 4
+    "production_per_week": 4,
+    "combat": {
+      "turn_rate": 3,
+      "roll_rate": 4,
+      "dive_speed_mph": 460,
+      "zoom_climb": 5,
+      "high_alt_modifier": 0.75,
+      "low_alt_modifier": 0.85,
+      "optimal_alt_ft": 18000,
+      "armament_type": "cannon_mg_heavy",
+      "burst_mass_lbs_sec": 4.2,
+      "ammo_seconds": 6,
+      "lethal_burst_sec": 0.8,
+      "convergence_range_yds": 300,
+      "effective_range_yds": 400,
+      "fuel_injection": true,
+      "cockpit_visibility": 0.7,
+      "gun_platform_stability": 0.85,
+      "structural_g_limit": 7.0,
+      "bounce_vulnerability": 0.25,
+      "notes": "Devastating forward firepower but poor manoeuvrability. Vulnerable to single-engine fighters in a turning fight — resorted to defensive circles. Rear gunner provides some protection. Better range than Bf 109 but the 'destroyer' concept failed against RAF fighters."
+    }
   },
   "he111h": {
     "name": "Heinkel He 111 H",
@@ -134,7 +281,29 @@
     "fuel_capacity_gallons": 530,
     "fuel_burn_per_hour": 95,
     "crew": 5,
-    "production_per_week": 6
+    "production_per_week": 6,
+    "combat": {
+      "turn_rate": 2,
+      "roll_rate": 2,
+      "dive_speed_mph": 300,
+      "zoom_climb": 1,
+      "high_alt_modifier": 0.5,
+      "low_alt_modifier": 0.9,
+      "optimal_alt_ft": 14000,
+      "armament_type": "defensive_mg",
+      "burst_mass_lbs_sec": 0.5,
+      "ammo_seconds": 30,
+      "lethal_burst_sec": 5.0,
+      "convergence_range_yds": 200,
+      "effective_range_yds": 400,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.8,
+      "gun_platform_stability": 0.9,
+      "structural_g_limit": 3.5,
+      "bounce_vulnerability": 0.15,
+      "formation_defense_bonus": 0.4,
+      "notes": "Workhorse medium bomber. Good defensive armament coverage but each gun position has limited traverse. Tight formation flying concentrates defensive fire. Self-sealing fuel tanks and armour plate give reasonable survivability."
+    }
   },
   "do17z": {
     "name": "Dornier Do 17 Z",
@@ -152,7 +321,29 @@
     "fuel_capacity_gallons": 340,
     "fuel_burn_per_hour": 75,
     "crew": 4,
-    "production_per_week": 4
+    "production_per_week": 4,
+    "combat": {
+      "turn_rate": 3,
+      "roll_rate": 3,
+      "dive_speed_mph": 330,
+      "zoom_climb": 2,
+      "high_alt_modifier": 0.6,
+      "low_alt_modifier": 0.85,
+      "optimal_alt_ft": 15000,
+      "armament_type": "defensive_mg",
+      "burst_mass_lbs_sec": 0.5,
+      "ammo_seconds": 25,
+      "lethal_burst_sec": 5.0,
+      "convergence_range_yds": 200,
+      "effective_range_yds": 350,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.75,
+      "gun_platform_stability": 0.8,
+      "structural_g_limit": 4.0,
+      "bounce_vulnerability": 0.2,
+      "formation_defense_bonus": 0.3,
+      "notes": "The 'Flying Pencil' — slim fuselage gave it some speed advantage but limited bomb load. Lighter than He 111, more vulnerable to fighter attack."
+    }
   },
   "ju87b": {
     "name": "Junkers Ju 87 B Stuka",
@@ -171,7 +362,29 @@
     "fuel_burn_per_hour": 55,
     "crew": 2,
     "production_per_week": 3,
-    "dive_bombing_accuracy": 9
+    "dive_bombing_accuracy": 9,
+    "combat": {
+      "turn_rate": 2,
+      "roll_rate": 2,
+      "dive_speed_mph": 340,
+      "zoom_climb": 1,
+      "high_alt_modifier": 0.3,
+      "low_alt_modifier": 0.7,
+      "optimal_alt_ft": 10000,
+      "armament_type": "defensive_light",
+      "burst_mass_lbs_sec": 0.3,
+      "ammo_seconds": 20,
+      "lethal_burst_sec": 8.0,
+      "convergence_range_yds": 150,
+      "effective_range_yds": 250,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.8,
+      "gun_platform_stability": 0.5,
+      "structural_g_limit": 6.0,
+      "bounce_vulnerability": 0.1,
+      "formation_defense_bonus": 0.1,
+      "notes": "Terrifying against ground targets but a death trap without fighter escort. Fixed undercarriage, slow speed, and poor manoeuvrability made it easy prey for Spitfires and Hurricanes. Withdrawn from Channel operations after devastating losses on 18 August (the 'Hardest Day')."
+    }
   },
   "ju88a": {
     "name": "Junkers Ju 88 A",
@@ -190,6 +403,28 @@
     "fuel_burn_per_hour": 85,
     "crew": 4,
     "production_per_week": 5,
-    "dive_bombing_accuracy": 6
+    "dive_bombing_accuracy": 6,
+    "combat": {
+      "turn_rate": 4,
+      "roll_rate": 4,
+      "dive_speed_mph": 400,
+      "zoom_climb": 3,
+      "high_alt_modifier": 0.65,
+      "low_alt_modifier": 0.9,
+      "optimal_alt_ft": 16000,
+      "armament_type": "defensive_mg",
+      "burst_mass_lbs_sec": 0.35,
+      "ammo_seconds": 20,
+      "lethal_burst_sec": 6.0,
+      "convergence_range_yds": 200,
+      "effective_range_yds": 350,
+      "fuel_injection": false,
+      "cockpit_visibility": 0.75,
+      "gun_platform_stability": 0.75,
+      "structural_g_limit": 5.0,
+      "bounce_vulnerability": 0.2,
+      "formation_defense_bonus": 0.25,
+      "notes": "Most versatile Luftwaffe bomber. Could perform shallow dive-bombing for improved accuracy. Faster than other bombers, sometimes able to outrun Hurricanes at altitude. Weak defensive armament with only 3 guns compared to He 111's 6."
+    }
   }
 }

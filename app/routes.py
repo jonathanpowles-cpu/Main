@@ -59,6 +59,52 @@ def set_time_scale():
     return jsonify({"success": True})
 
 
+@bp.route("/api/pilots")
+def get_pilots():
+    side = request.args.get("side", "")
+    squadron_id = request.args.get("squadron", "")
+    sort_by = request.args.get("sort", "kills")
+    aces_only = request.args.get("aces", "false") == "true"
+
+    pilots = list(engine.game.pilots.values())
+
+    if side:
+        from models.enums import Side
+        pilots = [p for p in pilots if p.side == Side(side)]
+    if squadron_id:
+        pilots = [p for p in pilots if p.squadron_id == squadron_id]
+    if aces_only:
+        pilots = [p for p in pilots if p.is_ace]
+
+    if sort_by == "kills":
+        pilots.sort(key=lambda p: p.kills, reverse=True)
+    elif sort_by == "sorties":
+        pilots.sort(key=lambda p: p.sorties, reverse=True)
+    elif sort_by == "experience":
+        pilots.sort(key=lambda p: p.experience, reverse=True)
+    elif sort_by == "name":
+        pilots.sort(key=lambda p: p.name)
+
+    limit = int(request.args.get("limit", 100))
+    return jsonify([p.to_dict() for p in pilots[:limit]])
+
+
+@bp.route("/api/pilot/<pilot_id>")
+def get_pilot(pilot_id):
+    pilot = engine.game.pilots.get(pilot_id)
+    if not pilot:
+        return jsonify({"error": "Pilot not found"}), 404
+    sqn = engine.game.squadrons.get(pilot.squadron_id)
+    data = pilot.to_dict()
+    if sqn:
+        data["squadron_name"] = sqn.name
+        data["aircraft_type"] = sqn.aircraft_type
+        ac_type = engine.game.aircraft_types.get(sqn.aircraft_type)
+        if ac_type:
+            data["aircraft_name"] = ac_type.name
+    return jsonify(data)
+
+
 @bp.route("/api/new_game", methods=["POST"])
 def new_game():
     global engine

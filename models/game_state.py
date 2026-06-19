@@ -6,10 +6,10 @@ from pathlib import Path
 
 from models.enums import (
     Side, AircraftRole, AircraftStatus, PilotStatus, SquadronState, GamePhase,
-    WeatherCondition, TimeOfDay,
+    WeatherCondition, TimeOfDay, Rank, CommandRole, Medal, TacticalDoctrine,
 )
-from models.aircraft import Aircraft, AircraftType
-from models.pilot import Pilot
+from models.aircraft import Aircraft, AircraftType, CombatProfile
+from models.pilot import Pilot, PilotTraits
 from models.squadron import Squadron
 from models.airfield import Airfield
 from models.radar import RadarStation
@@ -113,6 +113,7 @@ class GameState:
         self._load_aircraft_types()
         self._load_airfields()
         self._load_radar_stations()
+        self._load_historical_pilots()
         self._load_raf_squadrons()
         self._load_luftwaffe_units()
 
@@ -139,7 +140,34 @@ class GameState:
                 production_per_week=info["production_per_week"],
                 bomb_load_lbs=info.get("bomb_load_lbs", 0),
                 dive_bombing_accuracy=info.get("dive_bombing_accuracy", 0),
+                combat=self._load_combat_profile(info.get("combat", {})),
             )
+
+    @staticmethod
+    def _load_combat_profile(data: dict) -> CombatProfile:
+        if not data:
+            return CombatProfile()
+        return CombatProfile(
+            turn_rate=data.get("turn_rate", 5),
+            roll_rate=data.get("roll_rate", 5),
+            dive_speed_mph=data.get("dive_speed_mph", 400),
+            zoom_climb=data.get("zoom_climb", 5),
+            high_alt_modifier=data.get("high_alt_modifier", 0.7),
+            low_alt_modifier=data.get("low_alt_modifier", 0.8),
+            optimal_alt_ft=data.get("optimal_alt_ft", 18000),
+            armament_type=data.get("armament_type", "mg_battery"),
+            burst_mass_lbs_sec=data.get("burst_mass_lbs_sec", 1.0),
+            ammo_seconds=data.get("ammo_seconds", 14),
+            lethal_burst_sec=data.get("lethal_burst_sec", 2.0),
+            convergence_range_yds=data.get("convergence_range_yds", 250),
+            effective_range_yds=data.get("effective_range_yds", 300),
+            fuel_injection=data.get("fuel_injection", False),
+            cockpit_visibility=data.get("cockpit_visibility", 0.6),
+            gun_platform_stability=data.get("gun_platform_stability", 0.8),
+            structural_g_limit=data.get("structural_g_limit", 8.0),
+            bounce_vulnerability=data.get("bounce_vulnerability", 0.3),
+            formation_defense_bonus=data.get("formation_defense_bonus", 0.0),
+        )
 
     def _load_airfields(self):
         with open(DATA_DIR / "airfields.json") as f:
@@ -176,6 +204,116 @@ class GameState:
                 min_altitude_ft=info["min_altitude_ft"],
             )
 
+    def _load_historical_pilots(self):
+        hist_path = DATA_DIR / "historical_pilots.json"
+        self._historical_pilot_data = {"raf": {}, "luftwaffe": {}}
+        if not hist_path.exists():
+            return
+        with open(hist_path) as f:
+            data = json.load(f)
+        for side_key in ("raf", "luftwaffe"):
+            side_data = data.get(side_key, {})
+            for category in ("commanders", "squadron_leaders", "aces", "notable_pilots"):
+                for entry in side_data.get(category, []):
+                    unit = entry.get("unit", "")
+                    if unit not in self._historical_pilot_data[side_key]:
+                        self._historical_pilot_data[side_key][unit] = []
+                    self._historical_pilot_data[side_key][unit].append(entry)
+
+    def _create_historical_pilot(self, entry: dict, squadron_id: str, side: Side) -> Pilot:
+        traits_data = entry.get("traits", {})
+        traits = PilotTraits(
+            aggression=traits_data.get("aggression", 0.5),
+            situational_awareness=traits_data.get("situational_awareness", 0.5),
+            gunnery=traits_data.get("gunnery", 0.5),
+            leadership=traits_data.get("leadership", 0.5),
+            tactical_sense=traits_data.get("tactical_sense", 0.5),
+            coolness=traits_data.get("coolness", 0.5),
+            stamina=traits_data.get("stamina", 0.5),
+        )
+
+        rank_str = entry.get("rank", "pilot_officer")
+        try:
+            rank = Rank(rank_str)
+        except ValueError:
+            rank = Rank.PILOT_OFFICER if side == Side.RAF else Rank.LEUTNANT
+
+        role_str = entry.get("role", "pilot")
+        try:
+            command_role = CommandRole(role_str)
+        except ValueError:
+            command_role = CommandRole.PILOT
+
+        kills = entry.get("kills_at_start", 0)
+
+        pilot = Pilot(
+            id=f"hist_{squadron_id}_{entry['name'].lower().replace(' ', '_')}",
+            name=entry["name"],
+            squadron_id=squadron_id,
+            nationality=entry.get("nationality", "british"),
+            experience=entry.get("experience", 0.7),
+            side=side,
+            rank=rank,
+            command_role=command_role,
+            traits=traits,
+            historical=True,
+            historical_notes=entry.get("historical_notes", ""),
+            kills=kills,
+            is_ace=kills >= 5,
+        )
+        return pilot
+
+    def _generate_random_pilot(self, p_id: str, squadron_id: str, nationality: str,
+                                exp_base: float, side: Side, is_co: bool = False) -> Pilot:
+        name = _generate_pilot_name(nationality)
+        exp = max(0.1, min(1.0, exp_base + random.gauss(0, 0.15)))
+        if is_co:
+            exp = min(1.0, exp_base + 0.2)
+
+        trait_base = exp * 0.6 + 0.2
+        traits = PilotTraits(
+            aggression=max(0.1, min(1.0, trait_base + random.gauss(0, 0.15))),
+            situational_awareness=max(0.1, min(1.0, trait_base + random.gauss(0, 0.15))),
+            gunnery=max(0.1, min(1.0, trait_base + random.gauss(0, 0.15))),
+            leadership=max(0.1, min(1.0, trait_base + random.gauss(0, 0.12))),
+            tactical_sense=max(0.1, min(1.0, trait_base + random.gauss(0, 0.15))),
+            coolness=max(0.1, min(1.0, trait_base + random.gauss(0, 0.15))),
+            stamina=max(0.1, min(1.0, 0.5 + random.gauss(0, 0.15))),
+        )
+
+        if side == Side.RAF:
+            if is_co:
+                rank = Rank.SQUADRON_LEADER
+                role = CommandRole.SQUADRON_CO
+            elif exp > 0.7:
+                rank = Rank.FLIGHT_LIEUTENANT
+                role = CommandRole.FLIGHT_COMMANDER
+            elif exp > 0.5:
+                rank = Rank.FLYING_OFFICER
+                role = CommandRole.PILOT
+            else:
+                rank = Rank.PILOT_OFFICER
+                role = CommandRole.PILOT
+        else:
+            if is_co:
+                rank = Rank.HAUPTMANN
+                role = CommandRole.STAFFEL_KAPITAN
+            elif exp > 0.7:
+                rank = Rank.OBERLEUTNANT
+                role = CommandRole.PILOT
+            elif exp > 0.5:
+                rank = Rank.LEUTNANT
+                role = CommandRole.PILOT
+            else:
+                rank = Rank.FELDWEBEL
+                role = CommandRole.PILOT
+
+        return Pilot(
+            id=p_id, name=name, squadron_id=squadron_id,
+            nationality=nationality, experience=exp,
+            side=side, rank=rank, command_role=role, traits=traits,
+        )
+
     def _load_raf_squadrons(self):
         with open(DATA_DIR / "raf_squadrons.json") as f:
             data = json.load(f)
@@ -207,18 +345,27 @@ class GameState:
                 self.aircraft[ac_id] = ac
                 sqn.aircraft_ids.append(ac_id)
 
+            historical_for_unit = self._historical_pilot_data.get("raf", {}).get(sqn_id, [])
+            historical_placed = 0
+            for entry in historical_for_unit:
+                pilot = self._create_historical_pilot(entry, sqn_id, Side.RAF)
+                self.pilots[pilot.id] = pilot
+                sqn.pilot_ids.append(pilot.id)
+                if pilot.command_role == CommandRole.SQUADRON_CO:
+                    sqn.commanding_officer_id = pilot.id
+                historical_placed += 1
+
             pilot_count = info.get("pilot_strength", 18)
-            for i in range(pilot_count):
+            remaining = pilot_count - historical_placed
+            for i in range(max(0, remaining)):
                 p_id = f"{sqn_id}_pilot_{i}"
                 nat = info.get("nationality", "british")
-                name = _generate_pilot_name(nat)
-                exp = max(0.1, min(1.0, exp_base + random.gauss(0, 0.15)))
-                pilot = Pilot(
-                    id=p_id, name=name, squadron_id=sqn_id,
-                    nationality=nat, experience=exp,
+                is_co = (i == 0 and sqn.commanding_officer_id is None)
+                pilot = self._generate_random_pilot(
+                    p_id, sqn_id, nat, exp_base, Side.RAF, is_co=is_co,
                 )
-                if i == 0:
-                    pilot.experience = min(1.0, exp_base + 0.2)
+                if is_co:
+                    sqn.commanding_officer_id = pilot.id
                 self.pilots[p_id] = pilot
                 sqn.pilot_ids.append(p_id)
 
@@ -230,6 +377,12 @@ class GameState:
         with open(DATA_DIR / "luftwaffe_units.json") as f:
             data = json.load(f)
         for unit_id, info in data.items():
+            ac_type = self.aircraft_types.get(info["aircraft_type"])
+            if ac_type and ac_type.role == AircraftRole.FIGHTER:
+                doctrine = TacticalDoctrine.SCHWARM
+            else:
+                doctrine = TacticalDoctrine.CLOSE_ESCORT
+
             sqn = Squadron(
                 id=unit_id,
                 number=0,
@@ -242,6 +395,7 @@ class GameState:
                 experience_level="experienced",
                 nationality="german",
                 morale=0.85,
+                tactical_doctrine=doctrine,
             )
 
             ac_count = info.get("aircraft_strength", 90)
@@ -255,17 +409,28 @@ class GameState:
                 self.aircraft[ac_id] = ac
                 sqn.aircraft_ids.append(ac_id)
 
+            historical_for_unit = self._historical_pilot_data.get("luftwaffe", {}).get(unit_id, [])
+            historical_placed = 0
+            for entry in historical_for_unit:
+                pilot = self._create_historical_pilot(entry, unit_id, Side.LUFTWAFFE)
+                self.pilots[pilot.id] = pilot
+                sqn.pilot_ids.append(pilot.id)
+                if pilot.command_role in (CommandRole.GESCHWADER_KOMMODORE, CommandRole.GRUPPE_KOMMANDEUR):
+                    sqn.commanding_officer_id = pilot.id
+                historical_placed += 1
+
             crew_per_ac = self.aircraft_types.get(info["aircraft_type"])
             crew_size = crew_per_ac.crew if crew_per_ac else 1
             pilot_count = int(ac_count * 1.2 * crew_size)
-            for i in range(pilot_count):
+            remaining = pilot_count - historical_placed
+            for i in range(max(0, remaining)):
                 p_id = f"{unit_id}_pilot_{i}"
-                name = _generate_pilot_name("german")
-                exp = max(0.1, min(1.0, 0.7 + random.gauss(0, 0.15)))
-                pilot = Pilot(
-                    id=p_id, name=name, squadron_id=unit_id,
-                    nationality="german", experience=exp,
+                is_co = (i == 0 and sqn.commanding_officer_id is None)
+                pilot = self._generate_random_pilot(
+                    p_id, unit_id, "german", 0.7, Side.LUFTWAFFE, is_co=is_co,
                 )
+                if is_co:
+                    sqn.commanding_officer_id = pilot.id
                 self.pilots[p_id] = pilot
                 sqn.pilot_ids.append(p_id)
 

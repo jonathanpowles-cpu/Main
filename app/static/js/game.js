@@ -58,6 +58,9 @@ function init() {
 
     document.getElementById("sqn-filter-group").addEventListener("change", updateSquadronList);
     document.getElementById("sqn-filter-state").addEventListener("change", updateSquadronList);
+    document.getElementById("pilot-filter-side").addEventListener("change", loadPilots);
+    document.getElementById("pilot-sort").addEventListener("change", loadPilots);
+    document.getElementById("pilot-aces-only").addEventListener("change", loadPilots);
 
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
@@ -187,6 +190,7 @@ function updateUI() {
     updateSquadronList();
     updateOrdersPanel();
     updateEventLog();
+    updateTopPilots();
     drawMap();
 }
 
@@ -594,6 +598,121 @@ function drawLabels() {
         const pos = latLonToCanvas(l.lat, l.lon);
         ctx.fillText(l.text, pos.x, pos.y);
     });
+}
+
+const MEDAL_DISPLAY = {
+    distinguished_flying_cross: "DFC",
+    bar_to_dfc: "DFC & Bar",
+    distinguished_service_order: "DSO",
+    distinguished_flying_medal: "DFM",
+    victoria_cross: "VC",
+    iron_cross_2nd_class: "EK2",
+    iron_cross_1st_class: "EK1",
+    ritterkreuz: "RK",
+    ritterkreuz_with_oak_leaves: "RK+EL",
+    ritterkreuz_with_swords: "RK+Sw",
+    mentioned_in_despatches: "MiD",
+};
+
+function updateTopPilots() {
+    if (!state || !state.top_pilots) return;
+    const container = document.getElementById("pilot-list");
+    if (!container) return;
+    if (document.getElementById("tab-pilots").classList.contains("active") && container.children.length > 0) return;
+}
+
+async function loadPilots() {
+    const side = document.getElementById("pilot-filter-side").value;
+    const sort = document.getElementById("pilot-sort").value;
+    const acesOnly = document.getElementById("pilot-aces-only").checked;
+
+    let url = `/api/pilots?sort=${sort}&limit=100`;
+    if (side !== "all") url += `&side=${side}`;
+    if (acesOnly) url += `&aces=true`;
+
+    const res = await fetch(url);
+    const pilots = await res.json();
+    renderPilotList(pilots);
+}
+
+function renderPilotList(pilots) {
+    const container = document.getElementById("pilot-list");
+    container.innerHTML = pilots.map((p, idx) => {
+        const sideClass = p.side === "raf" ? "raf-card" : "lw-card";
+        const aceMarker = p.is_ace ? '<span class="ace-star">*</span>' : "";
+        const histMarker = p.historical ? '<span class="hist-marker">[H]</span>' : "";
+        const medals = (p.medals || []).map(m => MEDAL_DISPLAY[m] || m).join(", ");
+        const rank = p.rank.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        const statusClass = p.status === "available" ? "" :
+            p.status === "killed" ? "status-kia" :
+            p.status === "captured" ? "status-pow" :
+            p.status === "wounded" ? "status-wia" : "status-other";
+
+        return `<div class="pilot-item ${sideClass} ${statusClass}" onclick="showPilotDetail('${p.id}')">
+            <div class="pilot-header">
+                <span class="pilot-rank">${rank}</span>
+                <span class="pilot-name">${p.name} ${aceMarker}${histMarker}</span>
+            </div>
+            <div class="pilot-stats">
+                <span>Kills: <b>${p.kills}</b></span>
+                <span>Sorties: ${p.sorties}</span>
+                <span>Exp: ${Math.round(p.experience * 100)}%</span>
+                <span class="pilot-status-badge">${p.status}</span>
+            </div>
+            ${medals ? `<div class="pilot-medals">${medals}</div>` : ""}
+        </div>`;
+    }).join("");
+}
+
+async function showPilotDetail(pilotId) {
+    const res = await fetch(`/api/pilot/${pilotId}`);
+    const p = await res.json();
+    if (p.error) return;
+
+    const detail = document.getElementById("pilot-detail");
+    const medals = (p.medals || []).map(m => MEDAL_DISPLAY[m] || m).join(", ") || "None";
+    const rank = p.rank.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    const role = p.command_role.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    const traits = p.traits || {};
+
+    detail.innerHTML = `
+        <div class="detail-header">
+            <h3>${rank} ${p.name}</h3>
+            <button class="close-btn" onclick="document.getElementById('pilot-detail').style.display='none'">&times;</button>
+        </div>
+        <div class="detail-body">
+            <div class="detail-row"><span>Status:</span><span>${p.status}</span></div>
+            <div class="detail-row"><span>Role:</span><span>${role}</span></div>
+            <div class="detail-row"><span>Squadron:</span><span>${p.squadron_name || p.squadron_id}</span></div>
+            <div class="detail-row"><span>Aircraft:</span><span>${p.aircraft_name || p.aircraft_type || ""}</span></div>
+            <div class="detail-row"><span>Nationality:</span><span>${p.nationality}</span></div>
+            <div class="detail-row"><span>Kills:</span><span><b>${p.kills}</b>${p.is_ace ? " (ACE)" : ""}</span></div>
+            <div class="detail-row"><span>Sorties:</span><span>${p.sorties}</span></div>
+            <div class="detail-row"><span>Medals:</span><span>${medals}</span></div>
+            <div class="detail-row"><span>Fatigue:</span><span>${Math.round(p.fatigue * 100)}%</span></div>
+            <div class="detail-row"><span>Morale:</span><span>${Math.round(p.morale * 100)}%</span></div>
+            <h4>Traits</h4>
+            <div class="traits-grid">
+                ${Object.entries(traits).map(([k, v]) =>
+                    `<div class="trait-bar">
+                        <span class="trait-name">${k.replace(/_/g, " ")}</span>
+                        <div class="trait-fill-bg"><div class="trait-fill" style="width:${v * 100}%"></div></div>
+                        <span class="trait-val">${Math.round(v * 100)}</span>
+                    </div>`
+                ).join("")}
+            </div>
+            ${p.historical_notes ? `<div class="hist-notes">${p.historical_notes}</div>` : ""}
+            ${p.missions_log && p.missions_log.length > 0 ? `
+                <h4>Recent Missions</h4>
+                <div class="missions-log">
+                    ${p.missions_log.slice(-5).reverse().map(m =>
+                        `<div class="mission-entry">${m.date} — ${m.type}${m.kills > 0 ? ` (${m.kills} kills)` : ""}</div>`
+                    ).join("")}
+                </div>
+            ` : ""}
+        </div>
+    `;
+    detail.style.display = "block";
 }
 
 canvas && canvas.addEventListener("mousemove", e => {

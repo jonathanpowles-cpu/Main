@@ -373,6 +373,11 @@ class GameEngine:
         for rid, rs in self.game.radar_stations.items():
             radar[rid] = rs.to_dict()
 
+        aces = sorted(
+            [p for p in self.game.pilots.values() if p.kills > 0],
+            key=lambda p: p.kills, reverse=True,
+        )[:20]
+
         return {
             "summary": summary,
             "squadrons": squadrons,
@@ -388,6 +393,7 @@ class GameEngine:
                 }
                 for k, v in self.game.aircraft_types.items()
             },
+            "top_pilots": [p.to_dict() for p in aces],
         }
 
     def set_player_side(self, side: str):

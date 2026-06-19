@@ -89,6 +89,7 @@
                     <div id="panel-tabs">
                         <button class="tab-btn active" data-tab="overview">Overview</button>
                         <button class="tab-btn" data-tab="squadrons">Squadrons</button>
+                        <button class="tab-btn" data-tab="pilots">Pilots</button>
                         <button class="tab-btn" data-tab="orders">Orders</button>
                         <button class="tab-btn" data-tab="intel">Intel</button>
                     </div>
@@ -193,6 +194,27 @@
                             </select>
                         </div>
                         <div id="squadron-list" class="scrollable-list"></div>
+                    </div>
+
+                    <!-- Pilots Tab -->
+                    <div id="tab-pilots" class="tab-content">
+                        <div class="filter-bar">
+                            <select id="pilot-filter-side">
+                                <option value="all">Both Sides</option>
+                                <option value="raf">RAF</option>
+                                <option value="luftwaffe">Luftwaffe</option>
+                            </select>
+                            <select id="pilot-sort">
+                                <option value="kills">By Kills</option>
+                                <option value="sorties">By Sorties</option>
+                                <option value="experience">By Experience</option>
+                            </select>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="pilot-aces-only"> Aces
+                            </label>
+                        </div>
+                        <div id="pilot-list" class="scrollable-list"></div>
+                        <div id="pilot-detail" class="pilot-detail-panel" style="display:none"></div>
                     </div>
 
                     <!-- Orders Tab -->
