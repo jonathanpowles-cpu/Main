@@ -68,4 +68,34 @@ class Airfield:
             "squadron_ids": self.squadron_ids,
             "under_attack": self.under_attack,
             "aa_guns": self.aa_guns,
+            "hangars": self.hangars,
+            "dispersal_pens": self.dispersal_pens,
+            "fuel_current_tons": round(self.fuel_current_tons, 1),
+            "fuel_storage_tons": self.fuel_storage_tons,
+            "ammo_current_tons": round(self.ammo_current_tons, 1),
+            "ammo_storage_tons": self.ammo_storage_tons,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Airfield":
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            side=Side(data["side"]),
+            lat=data["lat"],
+            lon=data["lon"],
+            airfield_type=data["type"],
+            group=data["group"],
+            hangars=data.get("hangars", 3),
+            dispersal_pens=data.get("dispersal_pens", 12),
+            runway_condition=data.get("runway_condition", 1.0),
+            facilities_condition=data.get("facilities_condition", 1.0),
+            fuel_storage_tons=data.get("fuel_storage_tons", 100.0),
+            fuel_current_tons=data.get("fuel_current_tons", data.get("fuel_storage_tons", 100.0)),
+            ammo_storage_tons=data.get("ammo_storage_tons", 50.0),
+            ammo_current_tons=data.get("ammo_current_tons", data.get("ammo_storage_tons", 50.0)),
+            aa_guns=data.get("aa_guns", 4),
+            squadron_ids=list(data.get("squadron_ids", [])),
+            under_attack=data.get("under_attack", False),
+            damage_log=list(data.get("damage_log", [])),
+        )

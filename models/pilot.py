@@ -203,4 +203,50 @@ class Pilot:
             "medals": [m.value for m in self.medals],
             "traits": self.traits.to_dict(),
             "missions_log": self.missions_log[-10:],
+            "wounds_severity": round(self.wounds_severity, 2),
+            "recovery_hours": self.recovery_hours,
+            "hours_since_rest": round(self.hours_since_rest, 1),
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Pilot":
+        medals = []
+        for m_val in data.get("medals", []):
+            try:
+                medals.append(Medal(m_val))
+            except ValueError:
+                pass
+        td = data.get("traits", {})
+        traits = PilotTraits(
+            aggression=td.get("aggression", 0.5),
+            situational_awareness=td.get("situational_awareness", 0.5),
+            gunnery=td.get("gunnery", 0.5),
+            leadership=td.get("leadership", 0.5),
+            tactical_sense=td.get("tactical_sense", 0.5),
+            coolness=td.get("coolness", 0.5),
+            stamina=td.get("stamina", 0.5),
+        )
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            squadron_id=data["squadron_id"],
+            nationality=data.get("nationality", "british"),
+            experience=data.get("experience", 0.5),
+            side=Side(data["side"]),
+            rank=Rank(data["rank"]),
+            command_role=CommandRole(data["command_role"]),
+            medals=medals,
+            traits=traits,
+            historical=data.get("historical", False),
+            historical_notes=data.get("historical_notes", ""),
+            fatigue=data.get("fatigue", 0.0),
+            morale=data.get("morale", 1.0),
+            status=PilotStatus(data["status"]),
+            kills=data.get("kills", 0),
+            sorties=data.get("sorties", 0),
+            hours_since_rest=data.get("hours_since_rest", 0.0),
+            wounds_severity=data.get("wounds_severity", 0.0),
+            recovery_hours=int(data.get("recovery_hours", 0)),
+            is_ace=data.get("is_ace", False),
+            missions_log=list(data.get("missions_log", [])),
+        )

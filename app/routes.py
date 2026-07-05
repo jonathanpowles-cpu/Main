@@ -113,3 +113,33 @@ def new_game():
     side = data.get("side", "raf")
     engine.set_player_side(side)
     return jsonify(engine.get_state())
+
+
+@bp.route("/api/save", methods=["POST"])
+def save_game():
+    data = request.json or {}
+    slot = int(data.get("slot", 1))
+    return jsonify(engine.save_game(slot))
+
+
+@bp.route("/api/load", methods=["POST"])
+def load_game():
+    data = request.json or {}
+    slot = int(data.get("slot", 1))
+    result = engine.load_game(slot)
+    return jsonify(result)
+
+
+@bp.route("/api/saves")
+def list_saves():
+    return jsonify(engine.list_saves())
+
+
+@bp.route("/api/patrol", methods=["POST"])
+def assign_patrol():
+    data = request.json or {}
+    result = engine.assign_patrol(
+        squadron_id=data.get("squadron_id", ""),
+        sector=data.get("sector", ""),
+    )
+    return jsonify(result)

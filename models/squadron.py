@@ -23,6 +23,7 @@ class Squadron:
     rearm_hours_remaining: float = 0.0
     commanding_officer_id: str | None = None
     tactical_doctrine: TacticalDoctrine = TacticalDoctrine.VIC_THREE
+    patrol_sector: str | None = None
 
     def operational_aircraft(self, aircraft_lookup: dict) -> int:
         return sum(
@@ -44,7 +45,7 @@ class Squadron:
 
     def can_scramble(self, aircraft_lookup: dict, pilot_lookup: dict) -> bool:
         return (
-            self.state in (SquadronState.READY, SquadronState.STANDBY)
+            self.state in (SquadronState.READY, SquadronState.STANDBY, SquadronState.PATROLLING)
             and self.sortie_strength(aircraft_lookup, pilot_lookup) >= 3
         )
 
@@ -68,6 +69,61 @@ class Squadron:
     def doctrine_modifier(self) -> dict:
         """Returns combat modifiers based on tactical doctrine."""
         return DOCTRINE_MODIFIERS.get(self.tactical_doctrine, {})
+
+    def to_save_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "number": self.number,
+            "name": self.name,
+            "side": self.side.value,
+            "aircraft_type": self.aircraft_type,
+            "group": self.group,
+            "home_base": self.home_base,
+            "current_base": self.current_base,
+            "aircraft_ids": list(self.aircraft_ids),
+            "pilot_ids": list(self.pilot_ids),
+            "state": self.state.value,
+            "experience_level": self.experience_level,
+            "nationality": self.nationality,
+            "morale": round(self.morale, 3),
+            "current_mission": self.current_mission.value if self.current_mission else None,
+            "mission_target": self.mission_target,
+            "rearm_hours_remaining": self.rearm_hours_remaining,
+            "commanding_officer_id": self.commanding_officer_id,
+            "tactical_doctrine": self.tactical_doctrine.value,
+            "patrol_sector": self.patrol_sector,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Squadron":
+        mission = None
+        if data.get("current_mission"):
+            try:
+                mission = MissionType(data["current_mission"])
+            except ValueError:
+                pass
+        return cls(
+            id=data["id"],
+            number=data.get("number", 0),
+            name=data["name"],
+            side=Side(data["side"]),
+            aircraft_type=data["aircraft_type"],
+            group=data["group"],
+            home_base=data["home_base"],
+            current_base=data["current_base"],
+            aircraft_ids=list(data.get("aircraft_ids", [])),
+            pilot_ids=list(data.get("pilot_ids", [])),
+            state=SquadronState(data.get("state", "ready")),
+            experience_level=data.get("experience_level", "average"),
+            nationality=data.get("nationality", "british"),
+            morale=data.get("morale", 0.8),
+            current_mission=mission,
+            mission_target=data.get("mission_target"),
+            rearm_hours_remaining=data.get("rearm_hours_remaining", 0.0),
+            commanding_officer_id=data.get("commanding_officer_id"),
+            tactical_doctrine=TacticalDoctrine(data.get("tactical_doctrine", "vic_three")),
+            patrol_sector=data.get("patrol_sector"),
+        )
 
     def to_dict(self, aircraft_lookup: dict = None, pilot_lookup: dict = None) -> dict:
         result = {
@@ -93,6 +149,7 @@ class Squadron:
             result["available_pilots"] = self.available_pilots(pilot_lookup)
             result["sortie_strength"] = self.sortie_strength(aircraft_lookup, pilot_lookup)
             result["can_scramble"] = self.can_scramble(aircraft_lookup, pilot_lookup)
+            result["patrol_sector"] = self.patrol_sector
             if self.commanding_officer_id and self.commanding_officer_id in pilot_lookup:
                 co = pilot_lookup[self.commanding_officer_id]
                 result["commanding_officer"] = co.rank_and_name()

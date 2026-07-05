@@ -8,6 +8,31 @@ from models.enums import (
 from models.game_state import GameState
 from simulation.weather import is_flyable, FLYING_SUITABILITY
 
+# Patrol sectors: name -> (centre_lat, centre_lon, radius_miles)
+PATROL_SECTORS = {
+    "thames_estuary":   (51.5,  0.7,  30),
+    "kent":             (51.2,  0.9,  35),
+    "channel":          (50.7,  0.0,  40),
+    "sussex":           (50.9, -0.2,  35),
+    "portland":         (50.6, -2.5,  30),
+    "north_sea":        (52.0,  1.5,  40),
+    "midlands":         (52.5, -1.5,  45),
+    "northern":         (53.5, -1.0,  50),
+}
+
+# LW starting positions (approx lat/lon of bases in France/Belgium/Norway)
+LW_START_POSITIONS = [
+    (50.8, 2.3),   # Pas-de-Calais area
+    (50.6, 1.8),   # Abbeville area
+    (49.7, 0.5),   # Rouen area
+    (49.4, -0.4),  # Caen area
+    (50.4, 3.0),   # Belgium
+    (49.0, 2.5),   # Paris region (long-range)
+    (58.0, 8.0),   # Norway (Luftflotte 5)
+]
+
+RAID_SPEED_MILES_PER_HOUR = 220.0  # bomber speed over ground
+
 
 def generate_luftwaffe_raids(game: GameState) -> list[dict]:
     """Generate AI-controlled Luftwaffe raids based on current phase and conditions."""
@@ -40,7 +65,7 @@ def generate_raf_intercepts(game: GameState) -> list[dict]:
     intercepts = []
 
     for raid in game.active_raids:
-        if raid.get("detected", False):
+        if raid.get("detected", False) and raid.get("phase") in ("en_route", "attacking"):
             available_squadrons = _find_available_interceptors(game, raid)
             if available_squadrons:
                 num_to_scramble = min(len(available_squadrons), random.randint(1, 4))
@@ -62,6 +87,127 @@ def generate_raf_intercepts(game: GameState) -> list[dict]:
                 intercepts.append(intercept)
 
     return intercepts
+
+
+def move_raids(game: GameState) -> list[str]:
+    """Advance raid positions toward their targets. Returns list of newly-attacked target names."""
+    attacked = []
+    hours = game.time_scale_hours
+    distance_per_turn = RAID_SPEED_MILES_PER_HOUR * hours
+
+    for raid in game.active_raids:
+        if raid.get("resolved"):
+            continue
+
+        phase = raid.get("phase", "forming")
+        target_lat = raid.get("target_lat")
+        target_lon = raid.get("target_lon")
+
+        if target_lat is None or target_lon is None:
+            # Resolve immediately — legacy raid without position data
+            raid["phase"] = "attacking"
+            continue
+
+        if phase == "forming":
+            # First turn: move from base toward channel
+            raid["phase"] = "en_route"
+            # Move partway toward target
+            raid["lat"], raid["lon"] = _interpolate_position(
+                raid["lat"], raid["lon"], target_lat, target_lon, 0.4
+            )
+        elif phase == "en_route":
+            dist_remaining = _approx_distance(raid["lat"], raid["lon"], target_lat, target_lon)
+            if dist_remaining <= distance_per_turn or dist_remaining < 25:
+                raid["lat"] = target_lat
+                raid["lon"] = target_lon
+                raid["phase"] = "attacking"
+                attacked.append(raid["target_name"])
+            else:
+                frac = min(1.0, distance_per_turn / max(1, dist_remaining))
+                raid["lat"], raid["lon"] = _interpolate_position(
+                    raid["lat"], raid["lon"], target_lat, target_lon, frac
+                )
+        # "attacking" stays in place until resolved
+
+    return attacked
+
+
+def detect_raids(game: GameState) -> list[str]:
+    """Use radar and observer corps to detect incoming raids.
+    Returns list of raid IDs newly detected this turn."""
+    newly_detected = []
+
+    for raid in game.active_raids:
+        if raid.get("detected"):
+            continue
+
+        raid_alt = raid.get("altitude_ft", 15000)
+        raid_lat = raid.get("lat", 50.5)
+        raid_lon = raid.get("lon", 1.5)
+
+        for station in game.radar_stations.values():
+            if not station.operational:
+                continue
+            distance = _approx_distance(station.lat, station.lon, raid_lat, raid_lon)
+            if station.can_detect(raid_alt, distance):
+                raid["detected"] = True
+                raid["detected_by"] = station.id
+                size_estimate = len(raid.get("bomber_aircraft_ids", []))
+                noise = random.uniform(0.7, 1.5)
+                raid["estimated_size"] = int(size_estimate * noise)
+                game.add_event(
+                    "radar_detection",
+                    f"Radar at {station.name} detects raid of ~{raid['estimated_size']} aircraft heading for {raid['target_name']}",
+                    side="raf",
+                )
+                newly_detected.append(raid["id"])
+                break
+
+    return newly_detected
+
+
+def check_patrol_intercepts(game: GameState):
+    """Patrolling squadrons automatically intercept raids entering their sector."""
+    from simulation.combat import resolve_interception
+
+    for sqn in game.squadrons.values():
+        if sqn.side != Side.RAF:
+            continue
+        if sqn.state != SquadronState.PATROLLING or not sqn.patrol_sector:
+            continue
+
+        sector = PATROL_SECTORS.get(sqn.patrol_sector)
+        if not sector:
+            continue
+        sec_lat, sec_lon, sec_radius = sector
+
+        for raid in game.active_raids:
+            if raid.get("resolved") or raid.get("intercepted"):
+                continue
+            if raid.get("phase") not in ("en_route", "attacking"):
+                continue
+
+            raid_lat = raid.get("lat", 0)
+            raid_lon = raid.get("lon", 0)
+            dist = _approx_distance(sec_lat, sec_lon, raid_lat, raid_lon)
+
+            if dist <= sec_radius:
+                ac_ids = [
+                    ac_id for ac_id in sqn.aircraft_ids
+                    if game.aircraft.get(ac_id) and game.aircraft[ac_id].is_available()
+                ]
+                if not ac_ids:
+                    continue
+
+                results = resolve_interception(game, ac_ids, raid)
+                raid["intercepted"] = True
+                game.add_event(
+                    "interception",
+                    f"{sqn.name} (on patrol over {sqn.patrol_sector.replace('_', ' ')}) intercepts raid on {raid['target_name']}: "
+                    f"{len(results['lw_losses'])} enemy destroyed, {len(results['raf_losses'])} fighters lost",
+                    side="raf",
+                    details={"raf_losses": len(results["raf_losses"]), "lw_losses": len(results["lw_losses"])},
+                )
 
 
 def _phase_raid_intensity(phase: GamePhase) -> float:
@@ -162,11 +308,20 @@ def _plan_single_raid(game: GameState) -> dict | None:
     if not bomber_ac_ids:
         return None
 
+    # Pick a starting position on the French/Belgian/Norwegian coast
+    start_lat, start_lon = random.choice(LW_START_POSITIONS)
+    # If Luftflotte 5 target (northern England), bias to Norway start
+    target_lat = target.get("lat", 51.5)
+    if target_lat and target_lat > 53.0:
+        start_lat, start_lon = 58.0 + random.uniform(-1, 1), 8.0 + random.uniform(-2, 2)
+
     raid = {
         "id": f"raid_{game.turn_number}_{random.randint(1000, 9999)}",
         "target_id": target["id"],
         "target_type": target["type"],
         "target_name": target["name"],
+        "target_lat": target.get("lat", 51.5),
+        "target_lon": target.get("lon", -0.5),
         "bomber_unit_ids": [u.id for u in selected_bombers],
         "escort_unit_ids": [u.id for u in selected_escorts],
         "bomber_aircraft_ids": bomber_ac_ids,
@@ -176,8 +331,8 @@ def _plan_single_raid(game: GameState) -> dict | None:
         "intercepted": False,
         "resolved": False,
         "phase": "forming",
-        "lat": 50.5 + random.uniform(-0.5, 0.5),
-        "lon": 1.5 + random.uniform(-0.5, 0.5),
+        "lat": start_lat,
+        "lon": start_lon,
     }
 
     return raid
@@ -186,23 +341,32 @@ def _plan_single_raid(game: GameState) -> dict | None:
 def _select_target(game: GameState) -> dict | None:
     targets = []
 
+    def _af_target(af_id, af, priority):
+        return {"id": af_id, "type": "airfield", "name": af.name,
+                "priority": priority, "lat": af.lat, "lon": af.lon}
+
+    def _rs_target(rs_id, rs, priority):
+        return {"id": rs_id, "type": "radar_station", "name": rs.name,
+                "priority": priority, "lat": rs.lat, "lon": rs.lon}
+
     if game.phase == GamePhase.KANALKAMPF:
-        targets.append({"id": "convoy", "type": "convoy", "name": "Channel Convoy", "priority": 5})
+        targets.append({"id": "convoy", "type": "convoy", "name": "Channel Convoy",
+                        "priority": 5, "lat": 50.8, "lon": 0.5})
         for af_id, af in game.airfields.items():
             if af.side == Side.RAF and af.airfield_type == "forward_base":
-                targets.append({"id": af_id, "type": "airfield", "name": af.name, "priority": 3})
+                targets.append(_af_target(af_id, af, 3))
         for rs_id, rs in game.radar_stations.items():
             if rs.operational:
-                targets.append({"id": rs_id, "type": "radar_station", "name": rs.name, "priority": 2})
+                targets.append(_rs_target(rs_id, rs, 2))
 
     elif game.phase == GamePhase.ADLERANGRIFF:
         for rs_id, rs in game.radar_stations.items():
             if rs.operational:
-                targets.append({"id": rs_id, "type": "radar_station", "name": rs.name, "priority": 6})
+                targets.append(_rs_target(rs_id, rs, 6))
         for af_id, af in game.airfields.items():
             if af.side == Side.RAF and af.group in ("11_group", "10_group"):
                 p = 7 if af.airfield_type == "sector_station" else 4
-                targets.append({"id": af_id, "type": "airfield", "name": af.name, "priority": p})
+                targets.append(_af_target(af_id, af, p))
 
     elif game.phase == GamePhase.AIRFIELD_ATTACKS:
         for af_id, af in game.airfields.items():
@@ -210,14 +374,16 @@ def _select_target(game: GameState) -> dict | None:
                 p = 8 if af.airfield_type == "sector_station" else 5
                 if af.group == "11_group":
                     p += 2
-                targets.append({"id": af_id, "type": "airfield", "name": af.name, "priority": p})
+                targets.append(_af_target(af_id, af, p))
 
     elif game.phase == GamePhase.LONDON_BLITZ:
-        targets.append({"id": "london", "type": "city", "name": "London", "priority": 8})
-        targets.append({"id": "london_docks", "type": "port", "name": "London Docks", "priority": 7})
+        targets.append({"id": "london", "type": "city", "name": "London",
+                        "priority": 8, "lat": 51.5, "lon": -0.12})
+        targets.append({"id": "london_docks", "type": "port", "name": "London Docks",
+                        "priority": 7, "lat": 51.5, "lon": 0.0})
         for af_id, af in game.airfields.items():
             if af.side == Side.RAF and af.group == "11_group":
-                targets.append({"id": af_id, "type": "airfield", "name": af.name, "priority": 3})
+                targets.append(_af_target(af_id, af, 3))
 
     if not targets:
         return None
@@ -243,32 +409,11 @@ def _find_available_interceptors(game: GameState, raid: dict) -> list:
     return available
 
 
-def detect_raids(game: GameState):
-    """Use radar and observer corps to detect incoming raids."""
-    for raid in game.active_raids:
-        if raid.get("detected"):
-            continue
-
-        raid_alt = raid.get("altitude_ft", 15000)
-        raid_lat = raid.get("lat", 50.5)
-        raid_lon = raid.get("lon", 1.5)
-
-        for station in game.radar_stations.values():
-            if not station.operational:
-                continue
-            distance = _approx_distance(station.lat, station.lon, raid_lat, raid_lon)
-            if station.can_detect(raid_alt, distance):
-                raid["detected"] = True
-                raid["detected_by"] = station.id
-                size_estimate = len(raid.get("bomber_aircraft_ids", []))
-                noise = random.uniform(0.7, 1.5)
-                raid["estimated_size"] = int(size_estimate * noise)
-                game.add_event(
-                    "radar_detection",
-                    f"Radar at {station.name} detects raid of ~{raid['estimated_size']} aircraft heading for {raid['target_name']}",
-                    side="raf",
-                )
-                break
+def _interpolate_position(lat1, lon1, lat2, lon2, fraction):
+    return (
+        lat1 + (lat2 - lat1) * fraction,
+        lon1 + (lon2 - lon1) * fraction,
+    )
 
 
 def _approx_distance(lat1, lon1, lat2, lon2) -> float:

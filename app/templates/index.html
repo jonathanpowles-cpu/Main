@@ -67,6 +67,8 @@
                     </select>
                     <button id="advance-btn" class="control-btn">Advance ▶</button>
                     <button id="auto-btn" class="control-btn">Auto ▶▶</button>
+                    <button id="save-btn" class="control-btn save-btn" title="Save game">💾 Save</button>
+                    <button id="load-btn" class="control-btn load-btn" title="Load game">📂 Load</button>
                 </div>
             </header>
 
@@ -91,11 +93,13 @@
                         <button class="tab-btn" data-tab="squadrons">Squadrons</button>
                         <button class="tab-btn" data-tab="pilots">Pilots</button>
                         <button class="tab-btn" data-tab="orders">Orders</button>
+                        <button class="tab-btn" data-tab="facilities">Bases</button>
                         <button class="tab-btn" data-tab="intel">Intel</button>
                     </div>
 
                     <!-- Overview Tab -->
                     <div id="tab-overview" class="tab-content active">
+                        <div id="strategic-balance" class="strategic-balance"></div>
                         <div class="stats-grid">
                             <div class="stat-card raf-card">
                                 <h3>RAF Fighter Command</h3>
@@ -230,6 +234,16 @@
                                 </select>
                                 <button id="scramble-btn" class="action-btn">Scramble!</button>
                             </div>
+                            <h3>Set Patrol Sector</h3>
+                            <div class="order-form">
+                                <label>Squadron:</label>
+                                <select id="patrol-sqn"></select>
+                                <label>Sector:</label>
+                                <select id="patrol-sector">
+                                    <option value="">None (clear patrol)</option>
+                                </select>
+                                <button id="patrol-btn" class="action-btn">Assign Patrol</button>
+                            </div>
                         </div>
                         <div id="lw-orders" class="orders-section" style="display:none">
                             <h3>Launch Raid</h3>
@@ -245,6 +259,14 @@
                         </div>
                     </div>
 
+                    <!-- Facilities Tab -->
+                    <div id="tab-facilities" class="tab-content">
+                        <h3 class="facilities-heading">RAF Airfields</h3>
+                        <div id="airfield-facilities-list" class="scrollable-list"></div>
+                        <h3 class="facilities-heading">Radar Stations</h3>
+                        <div id="radar-facilities-list" class="scrollable-list"></div>
+                    </div>
+
                     <!-- Intel Tab -->
                     <div id="tab-intel" class="tab-content">
                         <div id="event-log" class="scrollable-list"></div>
@@ -255,6 +277,8 @@
     </div>
 
     <button id="view-toggle" title="Toggle Map / Panel">📋</button>
+    <div id="detection-banner" class="detection-banner" style="display:none"></div>
+    <div id="victory-overlay" class="victory-overlay" style="display:none"></div>
     <script src="/static/js/game.js"></script>
 </body>
 </html>

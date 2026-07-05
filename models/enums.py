@@ -36,6 +36,7 @@ class SquadronState(Enum):
     STANDBY = "standby"
     READY = "ready"
     AIRBORNE = "airborne"
+    PATROLLING = "patrolling"
     STOOD_DOWN = "stood_down"
     REARMING = "rearming"
     RELOCATING = "relocating"

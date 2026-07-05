@@ -108,6 +108,12 @@ class GameState:
 
         self.weather: WeatherCondition = WeatherCondition.FAIR
         self.visibility: float = 1.0
+        self.strategic_balance: float = 0.5  # 0=LW winning, 1=RAF winning
+        self.game_over: bool = False
+        self.winner: str = ""
+        self.victory_reason: str = ""
+        self.lw_bombs_total_tons: float = 0.0
+        self.lw_bombs_effective_tons: float = 0.0
 
     def load_data(self):
         self._load_aircraft_types()
@@ -436,6 +442,68 @@ class GameState:
 
             self.squadrons[unit_id] = sqn
 
+    def to_save_dict(self) -> dict:
+        return {
+            "current_date": self.current_date.isoformat(),
+            "turn_number": self.turn_number,
+            "phase": self.phase.value,
+            "player_side": self.player_side.value,
+            "time_scale_hours": self.time_scale_hours,
+            "weather": self.weather.value,
+            "visibility": self.visibility,
+            "aircraft": {k: v.to_dict() for k, v in self.aircraft.items()},
+            "pilots": {k: v.to_dict() for k, v in self.pilots.items()},
+            "squadrons": {k: v.to_save_dict() for k, v in self.squadrons.items()},
+            "airfields": {k: v.to_dict() for k, v in self.airfields.items()},
+            "radar_stations": {k: v.to_dict() for k, v in self.radar_stations.items()},
+            "active_raids": self.active_raids,
+            "event_log": self.event_log[-200:],
+            "raf_stats": self.raf_stats,
+            "luftwaffe_stats": self.luftwaffe_stats,
+            "strategic_balance": self.strategic_balance,
+            "game_over": self.game_over,
+            "winner": self.winner,
+            "victory_reason": self.victory_reason,
+            "lw_bombs_total_tons": self.lw_bombs_total_tons,
+            "lw_bombs_effective_tons": self.lw_bombs_effective_tons,
+        }
+
+    @classmethod
+    def load_from_save(cls, data: dict) -> "GameState":
+        gs = cls()
+        gs._load_aircraft_types()
+
+        gs.current_date = datetime.fromisoformat(data["current_date"])
+        gs.turn_number = data["turn_number"]
+        gs.phase = GamePhase(data["phase"])
+        gs.player_side = Side(data["player_side"])
+        gs.time_scale_hours = data["time_scale_hours"]
+        gs.weather = WeatherCondition(data["weather"])
+        gs.visibility = data["visibility"]
+        gs.raf_stats = data["raf_stats"]
+        gs.luftwaffe_stats = data["luftwaffe_stats"]
+        gs.active_raids = data["active_raids"]
+        gs.event_log = data["event_log"]
+        gs.strategic_balance = data.get("strategic_balance", 0.5)
+        gs.game_over = data.get("game_over", False)
+        gs.winner = data.get("winner", "")
+        gs.victory_reason = data.get("victory_reason", "")
+        gs.lw_bombs_total_tons = data.get("lw_bombs_total_tons", 0.0)
+        gs.lw_bombs_effective_tons = data.get("lw_bombs_effective_tons", 0.0)
+
+        for ac_id, ac_data in data["aircraft"].items():
+            gs.aircraft[ac_id] = Aircraft.from_dict(ac_data)
+        for pid, p_data in data["pilots"].items():
+            gs.pilots[pid] = Pilot.from_dict(p_data)
+        for sqn_id, sqn_data in data["squadrons"].items():
+            gs.squadrons[sqn_id] = Squadron.from_dict(sqn_data)
+        for af_id, af_data in data["airfields"].items():
+            gs.airfields[af_id] = Airfield.from_dict(af_data)
+        for rs_id, rs_data in data["radar_stations"].items():
+            gs.radar_stations[rs_id] = RadarStation.from_dict(rs_data)
+
+        return gs
+
     def get_time_of_day(self) -> TimeOfDay:
         hour = self.current_date.hour
         if hour < 5:
@@ -525,4 +593,8 @@ class GameState:
                 "stats": self.luftwaffe_stats,
             },
             "active_raids": len(self.active_raids),
+            "strategic_balance": round(self.strategic_balance, 3),
+            "game_over": self.game_over,
+            "winner": self.winner,
+            "victory_reason": self.victory_reason,
         }

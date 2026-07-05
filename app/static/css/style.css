@@ -764,3 +764,249 @@ body {
     .setup-container { padding: 20px; }
     .setup-container h1 { font-size: 1.5rem; }
 }
+
+/* Detection Banner */
+.detection-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: #b71c1c;
+    color: #fff;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    pointer-events: none;
+    animation: banner-flash 0.3s ease;
+}
+
+@keyframes banner-flash {
+    from { opacity: 0; transform: translateY(-100%); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Victory Overlay */
+.victory-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.victory-card {
+    background: var(--bg-panel);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 40px 56px;
+    text-align: center;
+    max-width: 480px;
+    width: 90%;
+}
+
+.victory-card.raf-win { border-color: var(--raf-light); }
+.victory-card.lw-win  { border-color: var(--lw-yellow); }
+
+.victory-card h1 {
+    font-size: 2.5rem;
+    letter-spacing: 0.3em;
+    margin-bottom: 8px;
+}
+
+.raf-win h1 { color: var(--raf-light); }
+.lw-win  h1 { color: var(--lw-yellow); }
+
+.victory-card h2 {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+    margin-bottom: 20px;
+}
+
+.victory-reason {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.victory-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+}
+
+.victory-card button {
+    background: var(--raf-blue);
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: background 0.2s;
+}
+
+.victory-card button:hover { background: var(--raf-light); }
+
+/* Strategic Balance */
+.strategic-balance {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+
+.balance-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.balance-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.balance-side {
+    font-size: 0.65rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.balance-side.lw-side { color: var(--lw-yellow); }
+.balance-side.raf-side { color: var(--raf-light); }
+
+.balance-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: var(--bg-input);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.balance-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Facilities Tab */
+.facilities-heading {
+    font-size: 0.75rem;
+    color: var(--text-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 10px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.facility-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+}
+
+.facility-hdr {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.fac-name {
+    font-weight: bold;
+    color: var(--text-primary);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fac-type {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    text-transform: capitalize;
+    flex-shrink: 0;
+}
+
+.fac-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 3px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.fac-bar-row > span:first-child { width: 60px; flex-shrink: 0; }
+.fac-bar-row > span:last-child  { width: 32px; text-align: right; flex-shrink: 0; color: var(--text-primary); }
+
+.fac-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-input);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.fac-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.fac-footer {
+    margin-top: 4px;
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+}
+
+/* Operational Status Badges */
+.op-green  { font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; background: rgba(102,187,106,0.15); color: var(--success); flex-shrink: 0; }
+.op-orange { font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; background: rgba(255,167,38,0.15);  color: var(--warning); flex-shrink: 0; }
+.op-red    { font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; background: rgba(239,83,80,0.15);   color: var(--danger);  flex-shrink: 0; }
+
+/* Patrol Badge on Squadron Cards */
+.patrol-badge {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: rgba(79, 195, 247, 0.12);
+    color: var(--text-accent);
+    border: 1px solid rgba(79, 195, 247, 0.25);
+    text-transform: capitalize;
+}
+
+/* Extra Squadron States */
+.state-patrolling { background: rgba(79,195,247,0.15); color: var(--text-accent); }
+.state-standby    { background: rgba(253,216,53,0.12); color: var(--lw-yellow); }
+
+/* Save / Load Buttons */
+.save-btn { background: #1b5e20; }
+.save-btn:hover { background: #2e7d32; }
+.load-btn { background: #0d47a1; }
+.load-btn:hover { background: #1565c0; }

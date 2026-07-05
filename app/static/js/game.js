@@ -38,6 +38,9 @@ function init() {
     document.getElementById("auto-btn").addEventListener("click", toggleAuto);
     document.getElementById("scramble-btn").addEventListener("click", scramble);
     document.getElementById("launch-raid-btn").addEventListener("click", launchRaid);
+    document.getElementById("save-btn").addEventListener("click", saveGame);
+    document.getElementById("load-btn").addEventListener("click", loadGame);
+    document.getElementById("patrol-btn").addEventListener("click", assignPatrol);
 
     document.getElementById("time-scale").addEventListener("change", e => {
         fetch("/api/set_time_scale", {
@@ -90,10 +93,13 @@ async function startGame() {
         body: JSON.stringify({ side: playerSide }),
     });
     state = await res.json();
+    enterGameScreen();
+}
 
+function enterGameScreen() {
+    playerSide = state.summary.player_side;
     document.getElementById("setup-screen").classList.remove("active");
     document.getElementById("game-screen").classList.add("active");
-
     if (playerSide === "raf") {
         document.getElementById("raf-orders").style.display = "block";
         document.getElementById("lw-orders").style.display = "none";
@@ -101,7 +107,6 @@ async function startGame() {
         document.getElementById("raf-orders").style.display = "none";
         document.getElementById("lw-orders").style.display = "block";
     }
-
     resizeCanvas();
     updateUI();
 }
@@ -114,9 +119,66 @@ async function advanceTurn() {
     });
     const turnResult = await res.json();
 
+    if (turnResult.new_detection && autoAdvance) {
+        toggleAuto();
+        showDetectionBanner(turnResult.newly_detected || []);
+    }
+
+    if (turnResult.victory && autoAdvance) {
+        toggleAuto();
+    }
+
     const fullRes = await fetch("/api/state");
     state = await fullRes.json();
     updateUI();
+}
+
+function showDetectionBanner(targets) {
+    const banner = document.getElementById("detection-banner");
+    if (!banner) return;
+    const text = targets.length
+        ? "⚠ RAID DETECTED — " + targets.join(", ") + " — AUTO-ADVANCE PAUSED"
+        : "⚠ ENEMY RAID DETECTED — AUTO-ADVANCE PAUSED";
+    banner.textContent = text;
+    banner.style.display = "block";
+    setTimeout(() => { banner.style.display = "none"; }, 10000);
+}
+
+async function saveGame() {
+    const res = await fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slot: 1 }),
+    });
+    const result = await res.json();
+    if (result.success) {
+        const banner = document.getElementById("detection-banner");
+        if (banner) {
+            banner.textContent = `✓ Game saved — ${result.saved_date ? result.saved_date.slice(0,10) : ""}`;
+            banner.style.background = "#1b5e20";
+            banner.style.display = "block";
+            setTimeout(() => { banner.style.display = "none"; banner.style.background = ""; }, 3000);
+        }
+    } else {
+        alert("Save failed");
+    }
+}
+
+async function loadGame() {
+    const res = await fetch("/api/load", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slot: 1 }),
+    });
+    const result = await res.json();
+    if (!result.success) {
+        alert(result.error || "No save found");
+        return;
+    }
+    state = result.state;
+    const wasOnSetup = document.getElementById("setup-screen").classList.contains("active");
+    if (wasOnSetup) enterGameScreen();
+    else { playerSide = state.summary.player_side; updateUI(); }
 }
 
 function toggleAuto() {
@@ -208,6 +270,9 @@ function updateUI() {
     updateOrdersPanel();
     updateEventLog();
     updateTopPilots();
+    updateStrategicBalance();
+    updateFacilitiesTab();
+    checkVictory();
     drawMap();
 }
 
@@ -237,6 +302,8 @@ function updateSquadronList() {
         const stateClass = "state-" + sqn.state;
         const sideClass = sqn.side === "raf" ? "raf-card" : "lw-card";
 
+        const patrolBadge = sqn.patrol_sector
+            ? `<span class="patrol-badge">📡 ${sqn.patrol_sector.replace(/_/g," ")}</span>` : "";
         return `<div class="sqn-item ${sideClass}">
             <div class="sqn-header">
                 <span class="sqn-name">${sqn.name}</span>
@@ -247,6 +314,7 @@ function updateSquadronList() {
                 <span>AC: ${sqn.operational_aircraft ?? "?"}/${sqn.aircraft_count}</span>
                 <span>Pilots: ${sqn.available_pilots ?? "?"}/${sqn.pilot_count}</span>
             </div>
+            ${patrolBadge}
         </div>`;
     }).join("");
 }
@@ -267,9 +335,27 @@ function updateOrdersPanel() {
         raidSelect.innerHTML = '<option value="">Patrol (no target)</option>';
         if (state.active_raids) {
             state.active_raids.forEach(r => {
-                if (r.detected) {
-                    raidSelect.innerHTML += `<option value="${r.id}">Raid on ${r.target_name} (~${r.estimated_size || "?"} ac)</option>`;
+                if (r.detected && r.phase !== "forming") {
+                    raidSelect.innerHTML += `<option value="${r.id}">Raid → ${r.target_name} (~${r.estimated_size || "?"} ac)</option>`;
                 }
+            });
+        }
+
+        // Patrol assignment UI
+        const patrolSqnSel = document.getElementById("patrol-sqn");
+        const patrolSectorSel = document.getElementById("patrol-sector");
+        if (patrolSqnSel) {
+            const patrolCandidates = Object.values(state.squadrons).filter(
+                s => s.side === "raf" && ["ready","standby","patrolling","rearming"].includes(s.state)
+            );
+            patrolSqnSel.innerHTML = patrolCandidates.map(s =>
+                `<option value="${s.id}">${s.name}${s.patrol_sector ? " 📡" : ""}</option>`
+            ).join("");
+        }
+        if (patrolSectorSel && state.patrol_sectors && patrolSectorSel.options.length <= 1) {
+            patrolSectorSel.innerHTML = '<option value="">None (clear patrol)</option>';
+            Object.entries(state.patrol_sectors).forEach(([k, v]) => {
+                patrolSectorSel.innerHTML += `<option value="${k}">${v}</option>`;
             });
         }
     } else {
@@ -419,24 +505,87 @@ function drawMap() {
         state.active_raids.forEach(raid => {
             if (!raid.lat || !raid.lon) return;
             const pos = latLonToCanvas(raid.lat, raid.lon);
+            const phase = raid.phase || "en_route";
+            const detected = !!raid.detected;
 
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(239, 83, 80, 0.3)";
-            ctx.fill();
-            ctx.strokeStyle = "#ef5350";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillStyle = "#ef5350";
-            ctx.font = "bold 9px monospace";
-            ctx.textAlign = "center";
-            ctx.fillText("✈", pos.x, pos.y + 3);
-
-            if (raid.detected && raid.target_name) {
-                ctx.fillStyle = "#ef5350";
-                ctx.font = "9px monospace";
-                ctx.fillText(raid.target_name, pos.x, pos.y - 12);
+            if (phase === "forming") {
+                if (!detected) return;
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(150, 150, 150, 0.4)";
+                ctx.fill();
+                ctx.strokeStyle = "#888";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.fillStyle = "#aaa";
+                ctx.font = "8px monospace";
+                ctx.textAlign = "center";
+                ctx.fillText("?", pos.x, pos.y + 3);
+            } else if (phase === "en_route") {
+                if (detected) {
+                    if (raid.target_lat && raid.target_lon) {
+                        const tpos = latLonToCanvas(raid.target_lat, raid.target_lon);
+                        ctx.beginPath();
+                        ctx.moveTo(pos.x, pos.y);
+                        ctx.lineTo(tpos.x, tpos.y);
+                        ctx.strokeStyle = "rgba(239, 83, 80, 0.4)";
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([4, 4]);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, 9, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(239, 83, 80, 0.25)";
+                    ctx.fill();
+                    ctx.strokeStyle = "#ef5350";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.fillStyle = "#ef5350";
+                    ctx.font = "bold 10px monospace";
+                    ctx.textAlign = "center";
+                    ctx.fillText("✈", pos.x, pos.y + 3);
+                    if (raid.target_name) {
+                        ctx.fillStyle = "#ef5350";
+                        ctx.font = "9px monospace";
+                        ctx.fillText("→ " + raid.target_name, pos.x, pos.y - 13);
+                    }
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, 7, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(150, 120, 60, 0.15)";
+                    ctx.fill();
+                    ctx.strokeStyle = "rgba(200, 180, 80, 0.35)";
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([3, 3]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = "rgba(200, 180, 80, 0.6)";
+                    ctx.font = "9px monospace";
+                    ctx.textAlign = "center";
+                    ctx.fillText("?", pos.x, pos.y + 3);
+                }
+            } else if (phase === "attacking") {
+                const r = 10;
+                ctx.strokeStyle = "#ef5350";
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(pos.x - r, pos.y - r);
+                ctx.lineTo(pos.x + r, pos.y + r);
+                ctx.moveTo(pos.x + r, pos.y - r);
+                ctx.lineTo(pos.x - r, pos.y + r);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, r + 3, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(239, 83, 80, 0.5)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                if (raid.target_name) {
+                    ctx.fillStyle = "#ff6659";
+                    ctx.font = "bold 9px monospace";
+                    ctx.textAlign = "center";
+                    ctx.fillText("ATTACK: " + raid.target_name, pos.x, pos.y - 16);
+                }
             }
         });
     }
@@ -730,6 +879,118 @@ async function showPilotDetail(pilotId) {
         </div>
     `;
     detail.style.display = "block";
+}
+
+async function assignPatrol() {
+    const sqnId = document.getElementById("patrol-sqn")?.value;
+    const sector = document.getElementById("patrol-sector")?.value || "";
+    if (!sqnId) return;
+    const res = await fetch("/api/patrol", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ squadron_id: sqnId, sector }),
+    });
+    const result = await res.json();
+    if (!result.success) { alert(result.message); return; }
+    const fullRes = await fetch("/api/state");
+    state = await fullRes.json();
+    updateUI();
+}
+
+function updateStrategicBalance() {
+    const el = document.getElementById("strategic-balance");
+    if (!el || !state) return;
+    const bal = Math.round((state.summary.strategic_balance ?? 0.5) * 100);
+    const color = bal >= 60 ? "#42a5f5" : bal >= 40 ? "#ffa726" : "#ef5350";
+    const label = bal >= 60 ? "RAF Advantage" : bal >= 40 ? "Contested" : "Luftwaffe Advantage";
+    el.innerHTML = `
+        <div class="balance-label">${label}</div>
+        <div class="balance-track">
+            <span class="balance-side lw-side">LW</span>
+            <div class="balance-bar-bg">
+                <div class="balance-bar-fill" style="width:${bal}%;background:${color}"></div>
+            </div>
+            <span class="balance-side raf-side">RAF</span>
+        </div>`;
+}
+
+function updateFacilitiesTab() {
+    if (!state) return;
+    const afCont = document.getElementById("airfield-facilities-list");
+    const rsCont = document.getElementById("radar-facilities-list");
+    if (!afCont || !rsCont) return;
+
+    const rafAF = Object.values(state.airfields)
+        .filter(af => af.side === "raf")
+        .sort((a, b) => (a.runway_condition || 1) - (b.runway_condition || 1));
+
+    afCont.innerHTML = rafAF.map(af => {
+        const rwy = Math.round((af.runway_condition || 1) * 100);
+        const fac = Math.round((af.facilities_condition || 1) * 100);
+        const fuel = Math.round((af.fuel_pct || 1) * 100);
+        const ammo = Math.round((af.ammo_pct || 1) * 100);
+        const opCls = af.is_operational ? (rwy > 50 ? "op-green" : "op-orange") : "op-red";
+        const opText = af.is_operational ? (af.can_launch ? "Operational" : "Restricted") : "NON-OPERATIONAL";
+        const barCol = rwy > 80 ? "#42a5f5" : rwy > 50 ? "#ffa726" : "#ef5350";
+        const bars = [["Runway", rwy, barCol], ["Facilities", fac, barCol],
+                      ["Fuel", fuel, "#66bb6a"], ["Ammo", ammo, "#ffa726"]];
+        return `<div class="facility-card">
+            <div class="facility-hdr">
+                <span class="fac-name">${af.name}</span>
+                <span class="fac-type">${(af.type||"").replace(/_/g," ")}</span>
+                <span class="${opCls}">${opText}</span>
+            </div>
+            ${bars.map(([lbl, pct, col]) =>
+                `<div class="fac-bar-row"><span>${lbl}</span>
+                 <div class="fac-bar-bg"><div class="fac-bar-fill" style="width:${pct}%;background:${col}"></div></div>
+                 <span>${pct}%</span></div>`
+            ).join("")}
+            <div class="fac-footer">Sqns: ${(af.squadron_ids||[]).length} | AA: ${af.aa_guns||0} guns</div>
+        </div>`;
+    }).join("");
+
+    rsCont.innerHTML = Object.values(state.radar_stations)
+        .sort((a, b) => (a.condition||1) - (b.condition||1))
+        .map(rs => {
+            const cond = Math.round((rs.condition||1) * 100);
+            const col = cond > 70 ? "#00e676" : cond > 30 ? "#ffa726" : "#ef5350";
+            const opCls = rs.operational ? "op-green" : "op-red";
+            return `<div class="facility-card">
+                <div class="facility-hdr">
+                    <span class="fac-name">${rs.name}</span>
+                    <span class="fac-type">${(rs.type||"").replace(/_/g," ")}</span>
+                    <span class="${opCls}">${rs.operational ? "Online" : "OFFLINE"}</span>
+                </div>
+                <div class="fac-bar-row"><span>Condition</span>
+                    <div class="fac-bar-bg"><div class="fac-bar-fill" style="width:${cond}%;background:${col}"></div></div>
+                    <span>${cond}%</span></div>
+                <div class="fac-footer">Range: ${rs.range_miles}mi | Min alt: ${rs.min_altitude_ft}ft</div>
+            </div>`;
+        }).join("");
+}
+
+function checkVictory() {
+    if (!state || !state.summary.game_over) return;
+    if (autoAdvance) toggleAuto();
+    const ov = document.getElementById("victory-overlay");
+    if (!ov || ov.dataset.shown === state.summary.winner) return;
+    ov.dataset.shown = state.summary.winner;
+    const isRaf = state.summary.winner === "raf";
+    const s = state.summary;
+    ov.innerHTML = `
+        <div class="victory-card ${isRaf ? "raf-win" : "lw-win"}">
+            <h1>${isRaf ? "VICTORY" : "DEFEAT"}</h1>
+            <h2>${isRaf ? "The RAF Has Held the Line" : "Luftwaffe Achieves Air Superiority"}</h2>
+            <p class="victory-reason">${s.victory_reason || ""}</p>
+            <div class="victory-stats">
+                <div>Turn ${s.turn}</div>
+                <div>RAF pilots lost: ${s.raf.stats.pilots_killed}</div>
+                <div>LW aircraft destroyed: ${(s.luftwaffe.stats.fighters_lost||0)+(s.luftwaffe.stats.bombers_lost||0)}</div>
+                <div>Airfields operational: ${s.raf.airfields_operational}</div>
+            </div>
+            <button onclick="document.getElementById('victory-overlay').style.display='none'">Continue Watching</button>
+        </div>`;
+    ov.style.display = "flex";
 }
 
 canvas && canvas.addEventListener("mousemove", e => {

@@ -47,3 +47,17 @@ class RadarStation:
             "condition": round(self.condition, 2),
             "operational": self.operational,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "RadarStation":
+        return cls(
+            id=data["id"],
+            name=data["name"],
+            lat=data["lat"],
+            lon=data["lon"],
+            station_type=data["type"],
+            range_miles=data.get("max_range_miles", data.get("range_miles", 100)),
+            min_altitude_ft=data.get("min_altitude_ft", 500),
+            condition=data.get("condition", 1.0),
+            operational=data.get("operational", True),
+        )

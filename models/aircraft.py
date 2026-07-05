@@ -94,4 +94,20 @@ class Aircraft:
             "ammo_remaining": self.ammo_remaining,
             "sorties_flown": self.sorties_flown,
             "kills": self.kills,
+            "repair_hours_remaining": self.repair_hours_remaining,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Aircraft":
+        return cls(
+            id=data["id"],
+            aircraft_type=data["aircraft_type"],
+            squadron_id=data["squadron_id"],
+            status=AircraftStatus(data["status"]),
+            damage=data.get("damage", 0.0),
+            fuel_remaining=data.get("fuel_remaining", 1.0),
+            ammo_remaining=data.get("ammo_remaining", 1.0),
+            sorties_flown=data.get("sorties_flown", 0),
+            kills=data.get("kills", 0),
+            repair_hours_remaining=int(data.get("repair_hours_remaining", 0)),
+        )
