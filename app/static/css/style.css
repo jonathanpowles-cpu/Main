@@ -1010,3 +1010,88 @@ body {
 .save-btn:hover { background: #2e7d32; }
 .load-btn { background: #0d47a1; }
 .load-btn:hover { background: #1565c0; }
+
+/* Map Selection Panel */
+.map-selection-panel {
+    position: absolute;
+    z-index: 60;
+    background: rgba(22, 33, 62, 0.97);
+    border: 1px solid var(--text-accent);
+    border-radius: 6px;
+    width: 240px;
+    font-size: 0.75rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    pointer-events: all;
+}
+
+.sel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sel-title {
+    font-weight: bold;
+    color: var(--text-accent);
+    font-size: 0.8rem;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sel-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.sel-close:hover { color: var(--text-primary); }
+
+.sel-body {
+    padding: 8px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sel-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+}
+.sel-row span:last-child { color: var(--text-primary); font-weight: bold; }
+
+.sel-desc {
+    margin-top: 6px;
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.4;
+}
+
+.sel-action-btn {
+    margin-top: 8px;
+    background: var(--raf-blue);
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: background 0.2s;
+    width: 100%;
+}
+.sel-action-btn:hover { background: var(--raf-light); }
+
+/* Map legend extra entries */
+.industrial-dot { background: #ffd700; transform: rotate(45deg); width: 8px; height: 8px; display: inline-block; }

@@ -1,0 +1,222 @@
+{
+  "supermarine_southampton": {
+    "name": "Supermarine Works, Woolston",
+    "target_type": "aircraft_factory",
+    "lat": 50.899,
+    "lon": -1.375,
+    "city": "Southampton",
+    "strategic_value": 3,
+    "description": "Primary Spitfire production on the River Itchen. Its destruction would severely curtail RAF fighter deliveries.",
+    "repair_rate_per_day": 0.03
+  },
+  "hawker_kingston": {
+    "name": "Hawker Aircraft, Kingston",
+    "target_type": "aircraft_factory",
+    "lat": 51.411,
+    "lon": -0.302,
+    "city": "Kingston upon Thames",
+    "strategic_value": 3,
+    "description": "Hurricane production facility south-west of London. Delivers the bulk of RAF Fighter Command's single-engine fighters.",
+    "repair_rate_per_day": 0.03
+  },
+  "bristol_filton": {
+    "name": "Bristol Aeroplane Co., Filton",
+    "target_type": "aircraft_factory",
+    "lat": 51.517,
+    "lon": -2.583,
+    "city": "Filton",
+    "strategic_value": 2,
+    "description": "Produces Beaufighter and Blenheim aircraft and Bristol Hercules aero engines.",
+    "repair_rate_per_day": 0.04
+  },
+  "vickers_brooklands": {
+    "name": "Vickers-Armstrongs, Brooklands",
+    "target_type": "aircraft_factory",
+    "lat": 51.356,
+    "lon": -0.459,
+    "city": "Weybridge",
+    "strategic_value": 2,
+    "description": "Wellington bomber and Spitfire sub-assembly production at Brooklands aerodrome.",
+    "repair_rate_per_day": 0.04
+  },
+  "rolls_royce_derby": {
+    "name": "Rolls-Royce, Derby",
+    "target_type": "aircraft_factory",
+    "lat": 52.921,
+    "lon": -1.477,
+    "city": "Derby",
+    "strategic_value": 3,
+    "description": "Sole source of the Merlin engine powering every Spitfire and Hurricane. Its destruction could cripple the entire RAF fighter force.",
+    "repair_rate_per_day": 0.03
+  },
+  "de_havilland_hatfield": {
+    "name": "de Havilland, Hatfield",
+    "target_type": "aircraft_factory",
+    "lat": 51.764,
+    "lon": -0.232,
+    "city": "Hatfield",
+    "strategic_value": 2,
+    "description": "Tiger Moth, Oxford trainer and early Mosquito development. Important contribution to aircrew supply.",
+    "repair_rate_per_day": 0.05
+  },
+  "short_rochester": {
+    "name": "Short Brothers, Rochester",
+    "target_type": "aircraft_factory",
+    "lat": 51.383,
+    "lon": 0.500,
+    "city": "Rochester",
+    "strategic_value": 2,
+    "description": "Stirling heavy bomber and Sunderland flying boat production on the Medway.",
+    "repair_rate_per_day": 0.04
+  },
+  "westland_yeovil": {
+    "name": "Westland Aircraft, Yeovil",
+    "target_type": "aircraft_factory",
+    "lat": 50.940,
+    "lon": -2.628,
+    "city": "Yeovil",
+    "strategic_value": 1,
+    "description": "Lysander and Whirlwind fighter production. Smaller output than the main Spitfire/Hurricane plants.",
+    "repair_rate_per_day": 0.06
+  },
+  "armstrong_coventry": {
+    "name": "Armstrong Siddeley, Coventry",
+    "target_type": "aircraft_factory",
+    "lat": 52.408,
+    "lon": -1.510,
+    "city": "Coventry",
+    "strategic_value": 2,
+    "description": "Aero-engine and aircraft component manufacture — one of the Midlands' key industrial centres.",
+    "repair_rate_per_day": 0.04
+  },
+  "portsmouth_dockyard": {
+    "name": "Portsmouth Royal Dockyard",
+    "target_type": "shipyard",
+    "lat": 50.797,
+    "lon": -1.107,
+    "city": "Portsmouth",
+    "strategic_value": 3,
+    "description": "Royal Navy's principal southern base. Home to destroyers and cruisers defending the Channel.",
+    "repair_rate_per_day": 0.04
+  },
+  "thornycroft_southampton": {
+    "name": "Thornycroft Shipyard",
+    "target_type": "shipyard",
+    "lat": 50.916,
+    "lon": -1.395,
+    "city": "Southampton",
+    "strategic_value": 2,
+    "description": "Destroyer and torpedo boat construction vital to maintaining Royal Navy strength.",
+    "repair_rate_per_day": 0.05
+  },
+  "cammell_laird_birkenhead": {
+    "name": "Cammell Laird Shipyard",
+    "target_type": "shipyard",
+    "lat": 53.390,
+    "lon": -3.015,
+    "city": "Birkenhead",
+    "strategic_value": 2,
+    "description": "One of Britain's largest shipyards, responsible for major warship construction and repair.",
+    "repair_rate_per_day": 0.05
+  },
+  "thameshaven_oil": {
+    "name": "Thames Haven Refinery",
+    "target_type": "oil_storage",
+    "lat": 51.514,
+    "lon": 0.556,
+    "city": "Canvey Island",
+    "strategic_value": 2,
+    "description": "Major petroleum storage and refinery serving London and south-east England.",
+    "repair_rate_per_day": 0.06
+  },
+  "shell_haven": {
+    "name": "Shell Haven Refinery",
+    "target_type": "oil_storage",
+    "lat": 51.506,
+    "lon": 0.487,
+    "city": "Stanford-le-Hope",
+    "strategic_value": 2,
+    "description": "Shell petroleum storage and refining on the north bank of the Thames estuary.",
+    "repair_rate_per_day": 0.06
+  },
+  "avonmouth_oil": {
+    "name": "Avonmouth Oil Terminal",
+    "target_type": "oil_storage",
+    "lat": 51.503,
+    "lon": -2.704,
+    "city": "Avonmouth",
+    "strategic_value": 1,
+    "description": "Western approaches fuel depot serving Bristol and South Wales.",
+    "repair_rate_per_day": 0.07
+  },
+  "london_docks": {
+    "name": "London Docks",
+    "target_type": "docks",
+    "lat": 51.504,
+    "lon": 0.024,
+    "city": "London",
+    "strategic_value": 3,
+    "description": "Surrey and Royal Victoria Docks — Britain's largest port complex, handling the bulk of wartime imports.",
+    "repair_rate_per_day": 0.04
+  },
+  "tilbury_docks": {
+    "name": "Tilbury Docks",
+    "target_type": "docks",
+    "lat": 51.463,
+    "lon": 0.363,
+    "city": "Tilbury",
+    "strategic_value": 2,
+    "description": "Major Thames estuary cargo port handling essential war supplies.",
+    "repair_rate_per_day": 0.05
+  },
+  "southampton_docks": {
+    "name": "Southampton Docks",
+    "target_type": "docks",
+    "lat": 50.896,
+    "lon": -1.413,
+    "city": "Southampton",
+    "strategic_value": 2,
+    "description": "Premier passenger and military cargo port on the Solent.",
+    "repair_rate_per_day": 0.05
+  },
+  "mersey_docks": {
+    "name": "Mersey Docks, Liverpool",
+    "target_type": "docks",
+    "lat": 53.450,
+    "lon": -3.005,
+    "city": "Liverpool",
+    "strategic_value": 3,
+    "description": "Vital Atlantic convoy terminus. Severing this port would strangle Britain's western supply line.",
+    "repair_rate_per_day": 0.04
+  },
+  "clapham_junction": {
+    "name": "Clapham Junction",
+    "target_type": "railway",
+    "lat": 51.464,
+    "lon": -0.170,
+    "city": "London",
+    "strategic_value": 2,
+    "description": "Busiest railway junction in Britain, routing supplies, troops and equipment across southern England.",
+    "repair_rate_per_day": 0.08
+  },
+  "crewe_railway": {
+    "name": "Crewe Railway Works",
+    "target_type": "railway",
+    "lat": 53.088,
+    "lon": -2.437,
+    "city": "Crewe",
+    "strategic_value": 2,
+    "description": "Major LMS junction and locomotive works linking the industrial north to the south.",
+    "repair_rate_per_day": 0.07
+  },
+  "battersea_power": {
+    "name": "Battersea Power Station",
+    "target_type": "power_station",
+    "lat": 51.482,
+    "lon": -0.144,
+    "city": "London",
+    "strategic_value": 2,
+    "description": "Coal-fired power station supplying electricity to central London and the Underground.",
+    "repair_rate_per_day": 0.06
+  }
+}

@@ -383,13 +383,28 @@ function updateOrdersPanel() {
             `<option value="${s.id}">${s.name} (${s.operational_aircraft ?? "?"} ac)</option>`
         ).join("");
 
+        const TYPE_LABELS = {
+            aircraft_factory: "Factory", shipyard: "Shipyard",
+            oil_storage: "Oil", docks: "Docks", railway: "Railway",
+            power_station: "Power", port: "Port",
+        };
         const targets = Object.values(state.airfields)
             .filter(a => a.side === "raf")
             .map(a => `<option value="${a.id}|airfield">${a.name} (Airfield)</option>`)
             .concat(
-                Object.values(state.radar_stations)
+                Object.values(state.radar_stations || {})
                     .filter(r => r.operational)
                     .map(r => `<option value="${r.id}|radar_station">${r.name} (Radar)</option>`)
+            )
+            .concat(
+                Object.values(state.industrial_targets || {})
+                    .filter(it => it.condition > 0.05)
+                    .sort((a, b) => b.strategic_value - a.strategic_value)
+                    .map(it => {
+                        const lbl = TYPE_LABELS[it.target_type] || it.target_type;
+                        const cond = Math.round(it.condition * 100);
+                        return `<option value="${it.id}|industrial">${it.name} (${lbl} — ${cond}%)</option>`;
+                    })
             );
 
         targetSelect.innerHTML = targets.join("");
@@ -498,6 +513,38 @@ function drawMap() {
             ctx.closePath();
             ctx.fillStyle = rs.operational ? "#00e676" : "#ef5350";
             ctx.fill();
+        });
+    }
+
+    // Industrial targets — diamond shape, colour by type
+    const IT_COLORS = {
+        aircraft_factory: "#ffd700",
+        shipyard:         "#00bcd4",
+        oil_storage:      "#ff6d00",
+        docks:            "#4caf50",
+        railway:          "#ce93d8",
+        power_station:    "#fff176",
+        port:             "#80cbc4",
+    };
+    if (state.industrial_targets) {
+        Object.values(state.industrial_targets).forEach(it => {
+            const pos = latLonToCanvas(it.lat, it.lon);
+            const color = IT_COLORS[it.target_type] || "#aaa";
+            const r = 5 + it.strategic_value;
+            const alpha = Math.max(0.4, it.condition);
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.moveTo(pos.x,     pos.y - r);
+            ctx.lineTo(pos.x + r, pos.y    );
+            ctx.lineTo(pos.x,     pos.y + r);
+            ctx.lineTo(pos.x - r, pos.y    );
+            ctx.closePath();
+            ctx.fillStyle = color + "33";
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.globalAlpha = 1.0;
         });
     }
 
@@ -993,6 +1040,184 @@ function checkVictory() {
     ov.style.display = "flex";
 }
 
+// ── Map click-to-select ───────────────────────────────────────────────────────
+
+canvas && canvas.addEventListener("click", e => {
+    if (!state) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const my = (e.clientY - rect.top)  * (canvas.height / rect.height);
+
+    const HIT = 14;
+    const best = { dist: HIT + 1, type: null, item: null, pos: null };
+
+    const check = (type, items, getPos) => {
+        for (const item of Object.values(items || {})) {
+            const pos = getPos(item);
+            if (!pos) continue;
+            const d = Math.hypot(pos.x - mx, pos.y - my);
+            if (d < HIT && d < best.dist) {
+                best.dist = d; best.type = type; best.item = item; best.pos = pos;
+            }
+        }
+    };
+
+    check("airfield",   state.airfields,          af => af.lat != null ? latLonToCanvas(af.lat, af.lon) : null);
+    check("radar",      state.radar_stations,      rs => rs.lat != null ? latLonToCanvas(rs.lat, rs.lon) : null);
+    check("industrial", state.industrial_targets,  it => it.lat != null ? latLonToCanvas(it.lat, it.lon) : null);
+
+    // Raids have a larger hit radius
+    for (const raid of (state.active_raids || [])) {
+        if (!raid.lat || !raid.lon) continue;
+        const pos = latLonToCanvas(raid.lat, raid.lon);
+        const d = Math.hypot(pos.x - mx, pos.y - my);
+        if (d < HIT + 4 && d < best.dist) {
+            best.dist = d; best.type = "raid"; best.item = raid; best.pos = pos;
+        }
+    }
+
+    if (best.type) {
+        showMapSelection(best.type, best.item, best.pos);
+    } else {
+        dismissMapSelection();
+    }
+});
+
+function showMapSelection(type, item, pos) {
+    let panel = document.getElementById("map-selection-panel");
+    if (!panel) {
+        panel = document.createElement("div");
+        panel.id = "map-selection-panel";
+        panel.className = "map-selection-panel";
+        document.getElementById("map-panel").appendChild(panel);
+    }
+    panel.innerHTML = buildSelectionHtml(type, item);
+
+    const mapEl = document.getElementById("map-panel");
+    const mapW = mapEl.clientWidth;
+    const mapH = mapEl.clientHeight;
+    const PW = 240, PH = 220;
+    let px = pos.x + 16, py = pos.y - 10;
+    if (px + PW > mapW) px = pos.x - PW - 4;
+    if (py + PH > mapH) py = mapH - PH - 4;
+    if (py < 0) py = 4;
+    if (px < 0) px = 4;
+    panel.style.left = px + "px";
+    panel.style.top  = py + "px";
+    panel.style.display = "block";
+}
+
+function dismissMapSelection() {
+    const panel = document.getElementById("map-selection-panel");
+    if (panel) panel.style.display = "none";
+}
+
+function buildSelectionHtml(type, item) {
+    const X = `<button class="sel-close" onclick="dismissMapSelection()">✕</button>`;
+
+    if (type === "airfield") {
+        const rwy = Math.round((item.runway_condition || 1) * 100);
+        const fuel = Math.round((item.fuel_pct || 1) * 100);
+        const ammo = Math.round((item.ammo_pct || 1) * 100);
+        const opCls  = item.is_operational ? (rwy > 50 ? "op-green" : "op-orange") : "op-red";
+        const opText = item.is_operational ? (item.can_launch ? "Operational" : "Restricted") : "NON-OPERATIONAL";
+        const sideLabel = item.side === "raf" ? "RAF" : "Luftwaffe";
+        const orderBtn = (item.side === "raf" && playerSide === "raf")
+            ? `<button class="sel-action-btn" onclick="focusAirfieldOrders('${item.id}')">Go to Orders</button>` : "";
+        return `<div class="sel-header"><span class="sel-title">${item.name}</span>${X}</div>
+        <div class="sel-body">
+            <div class="sel-row"><span>Side</span><span>${sideLabel}</span></div>
+            <div class="sel-row"><span>Type</span><span>${(item.type||"").replace(/_/g," ")}</span></div>
+            <div class="sel-row"><span>Status</span><span class="${opCls}">${opText}</span></div>
+            <div class="sel-row"><span>Runway</span><span>${rwy}%</span></div>
+            <div class="sel-row"><span>Fuel</span><span>${fuel}%</span></div>
+            <div class="sel-row"><span>Ammo</span><span>${ammo}%</span></div>
+            <div class="sel-row"><span>Squadrons</span><span>${(item.squadron_ids||[]).length}</span></div>
+            ${orderBtn}
+        </div>`;
+    }
+
+    if (type === "radar") {
+        const cond = Math.round((item.condition || 1) * 100);
+        const opCls = item.operational ? "op-green" : "op-red";
+        return `<div class="sel-header"><span class="sel-title">${item.name}</span>${X}</div>
+        <div class="sel-body">
+            <div class="sel-row"><span>Type</span><span>${(item.type||"").replace(/_/g," ")}</span></div>
+            <div class="sel-row"><span>Status</span><span class="${opCls}">${item.operational ? "Online" : "OFFLINE"}</span></div>
+            <div class="sel-row"><span>Condition</span><span>${cond}%</span></div>
+            <div class="sel-row"><span>Range</span><span>${item.range_miles} mi</span></div>
+            <div class="sel-row"><span>Min Alt</span><span>${item.min_altitude_ft} ft</span></div>
+        </div>`;
+    }
+
+    if (type === "industrial") {
+        const cond   = Math.round((item.condition || 1) * 100);
+        const condCls = cond > 70 ? "op-green" : cond > 40 ? "op-orange" : "op-red";
+        const TYPE_LABELS = {
+            aircraft_factory: "Aircraft Factory", shipyard: "Shipyard",
+            oil_storage: "Oil Storage", docks: "Docks", railway: "Railway Junction",
+            power_station: "Power Station", port: "Port",
+        };
+        const tgtBtn = playerSide === "luftwaffe"
+            ? `<button class="sel-action-btn" onclick="setRaidTarget('${item.id}','industrial')">Set as Raid Target</button>` : "";
+        return `<div class="sel-header"><span class="sel-title">${item.name}</span>${X}</div>
+        <div class="sel-body">
+            <div class="sel-row"><span>Type</span><span>${TYPE_LABELS[item.target_type] || item.target_type}</span></div>
+            <div class="sel-row"><span>City</span><span>${item.city}</span></div>
+            <div class="sel-row"><span>Condition</span><span class="${condCls}">${cond}%</span></div>
+            <div class="sel-row"><span>Times Bombed</span><span>${item.times_bombed}</span></div>
+            <div class="sel-row"><span>Priority</span><span>${"★".repeat(item.strategic_value)}</span></div>
+            <div class="sel-desc">${item.description}</div>
+            ${tgtBtn}
+        </div>`;
+    }
+
+    if (type === "raid") {
+        const scrambleBtn = (playerSide === "raf" && item.detected)
+            ? `<button class="sel-action-btn" onclick="scrambleAgainstRaid('${item.id}')">Scramble Against</button>` : "";
+        return `<div class="sel-header"><span class="sel-title">Enemy Raid</span>${X}</div>
+        <div class="sel-body">
+            <div class="sel-row"><span>Target</span><span>${item.target_name || "?"}</span></div>
+            <div class="sel-row"><span>Phase</span><span>${item.phase || "?"}</span></div>
+            <div class="sel-row"><span>Est. Size</span><span>~${item.estimated_size || "?"} ac</span></div>
+            <div class="sel-row"><span>Detected</span><span>${item.detected ? "Yes" : "No"}</span></div>
+            ${scrambleBtn}
+        </div>`;
+    }
+
+    return "";
+}
+
+function focusAirfieldOrders(airfieldId) {
+    document.querySelector("[data-tab='orders']").click();
+    dismissMapSelection();
+}
+
+function setRaidTarget(targetId, targetType) {
+    document.querySelector("[data-tab='orders']").click();
+    const sel = document.getElementById("raid-target");
+    if (sel) {
+        const val = targetId + "|" + targetType;
+        for (const opt of sel.options) {
+            if (opt.value === val) { opt.selected = true; break; }
+        }
+    }
+    dismissMapSelection();
+}
+
+function scrambleAgainstRaid(raidId) {
+    document.querySelector("[data-tab='orders']").click();
+    const sel = document.getElementById("scramble-raid");
+    if (sel) {
+        for (const opt of sel.options) {
+            if (opt.value === raidId) { opt.selected = true; break; }
+        }
+    }
+    dismissMapSelection();
+}
+
+// ── Map hover tooltip ─────────────────────────────────────────────────────────
+
 canvas && canvas.addEventListener("mousemove", e => {
     if (!state) return;
     const rect = canvas.getBoundingClientRect();
@@ -1039,6 +1264,20 @@ canvas && canvas.addEventListener("mousemove", e => {
              <p>Range: ${rs.range_miles} mi</p>
              <p>Condition: ${Math.round(rs.condition * 100)}%</p>
              <p>Status: ${rs.operational ? "Operational" : "Down"}</p>`
+        );
+    }
+
+    if (!found) {
+        const IT_TYPE = {
+            aircraft_factory: "Aircraft Factory", shipyard: "Shipyard",
+            oil_storage: "Oil Storage", docks: "Docks", railway: "Railway",
+            power_station: "Power Station", port: "Port",
+        };
+        found = checkItems(state.industrial_targets, it =>
+            `<h4>${it.name}</h4>
+             <p>Type: ${IT_TYPE[it.target_type] || it.target_type}</p>
+             <p>Condition: ${Math.round(it.condition * 100)}%</p>
+             <p>Times Bombed: ${it.times_bombed}</p>`
         );
     }
 

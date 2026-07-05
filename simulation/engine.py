@@ -201,6 +201,8 @@ class GameEngine:
             target_name = self.game.airfields[target_id].name
         elif target_id in self.game.radar_stations:
             target_name = self.game.radar_stations[target_id].name
+        elif target_id in self.game.industrial_targets:
+            target_name = self.game.industrial_targets[target_id].name
 
         start_lat, start_lon = 50.8, 2.3
         if target_lat and target_lat > 53.0:
@@ -311,6 +313,9 @@ class GameEngine:
         if target_type == "radar_station" and target_id in self.game.radar_stations:
             rs = self.game.radar_stations[target_id]
             return rs.lat, rs.lon
+        if target_type == "industrial" and target_id in self.game.industrial_targets:
+            it = self.game.industrial_targets[target_id]
+            return it.lat, it.lon
         return CITY_POS.get(target_id, (51.3, -0.1))
 
     def _update_weather(self):
@@ -349,6 +354,9 @@ class GameEngine:
             if not rs.operational or rs.condition < 1.0:
                 rs.repair(hours)
 
+        for it in self.game.industrial_targets.values():
+            it.repair(hours)
+
     def _process_pilot_recovery(self):
         hours = self.game.time_scale_hours
         for pilot in self.game.pilots.values():
@@ -376,9 +384,21 @@ class GameEngine:
 
     def _aircraft_production(self):
         if self.game.current_date.hour == 6 and self.game.time_scale_hours <= 24:
+            # Factory damage penalty: average condition of all aircraft factories
+            factory_penalty = 1.0
+            if self.game.industrial_targets:
+                factories = [
+                    it for it in self.game.industrial_targets.values()
+                    if it.target_type == "aircraft_factory"
+                ]
+                if factories:
+                    avg_cond = sum(it.condition for it in factories) / len(factories)
+                    if avg_cond < 0.8:
+                        factory_penalty = max(0.4, avg_cond)
+
             for ac_type_id, ac_type in self.game.aircraft_types.items():
                 if ac_type.side == Side.RAF and ac_type.role.value == "fighter":
-                    daily = ac_type.production_per_week / 7.0
+                    daily = (ac_type.production_per_week / 7.0) * factory_penalty
                     new_ac = int(daily)
                     if random.random() < (daily - new_ac):
                         new_ac += 1
@@ -443,6 +463,35 @@ class GameEngine:
                         side="luftwaffe",
                         details=results,
                     )
+            elif ttype == "industrial":
+                it = self.game.industrial_targets.get(raid["target_id"])
+                if it:
+                    disruption = raid.get("bombs_jettisoned_pct", 0.0)
+                    if raid.get("raid_disrupted"):
+                        disruption = max(disruption, 0.5)
+                    bombers = len(raid.get("bomber_aircraft_ids", []))
+                    effectiveness = (1.0 - disruption) * max(0.3, self.game.visibility)
+                    damage = min(0.55, bombers * 0.012 * effectiveness * random.uniform(0.6, 1.4))
+                    it.condition = max(0.0, it.condition - damage)
+                    it.times_bombed += 1
+                    tons = bombers * 1.8 * effectiveness
+                    self.game.lw_bombs_total_tons += tons
+                    self.game.lw_bombs_effective_tons += tons
+                    self.game.luftwaffe_stats["bombs_dropped_tons"] = (
+                        self.game.luftwaffe_stats.get("bombs_dropped_tons", 0) + tons
+                    )
+                    self.game.add_event(
+                        "bombing",
+                        f"{it.name} bombed: {damage:.0%} damage inflicted "
+                        f"({it.condition:.0%} condition remaining). {tons:.0f} tons dropped.",
+                        side="luftwaffe",
+                    )
+                    if it.target_type == "aircraft_factory" and it.condition < 0.5:
+                        self.game.add_event(
+                            "industrial_damage",
+                            f"WARNING: {it.name} is severely damaged — fighter production disrupted.",
+                            side="raf",
+                        )
             elif ttype in ("city", "port"):
                 tons = len(raid.get("bomber_aircraft_ids", [])) * 2.0
                 self.game.lw_bombs_total_tons += tons
@@ -560,11 +609,13 @@ class GameEngine:
             [p for p in self.game.pilots.values() if p.kills > 0],
             key=lambda p: p.kills, reverse=True,
         )[:20]
+        industrial = {tid: it.to_dict() for tid, it in self.game.industrial_targets.items()}
         return {
             "summary": summary,
             "squadrons": squadrons,
             "airfields": airfields,
             "radar_stations": radar,
+            "industrial_targets": industrial,
             "active_raids": self.game.active_raids,
             "events": self.game.event_log[-50:],
             "aircraft_types": {

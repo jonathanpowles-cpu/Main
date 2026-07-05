@@ -349,6 +349,10 @@ def _select_target(game: GameState) -> dict | None:
         return {"id": rs_id, "type": "radar_station", "name": rs.name,
                 "priority": priority, "lat": rs.lat, "lon": rs.lon}
 
+    def _it_target(tid, it, priority):
+        return {"id": tid, "type": "industrial", "name": it.name,
+                "priority": priority, "lat": it.lat, "lon": it.lon}
+
     if game.phase == GamePhase.KANALKAMPF:
         targets.append({"id": "convoy", "type": "convoy", "name": "Channel Convoy",
                         "priority": 5, "lat": 50.8, "lon": 0.5})
@@ -358,6 +362,11 @@ def _select_target(game: GameState) -> dict | None:
         for rs_id, rs in game.radar_stations.items():
             if rs.operational:
                 targets.append(_rs_target(rs_id, rs, 2))
+        # Early coastal industrial raids (port / shipyard targets)
+        for tid, it in game.industrial_targets.items():
+            if it.target_type in ("shipyard", "docks", "port") and it.condition > 0.1:
+                if it.lat < 52.0:  # southern coastal only in Kanalkampf
+                    targets.append(_it_target(tid, it, 2 * it.strategic_value))
 
     elif game.phase == GamePhase.ADLERANGRIFF:
         for rs_id, rs in game.radar_stations.items():
@@ -367,6 +376,13 @@ def _select_target(game: GameState) -> dict | None:
             if af.side == Side.RAF and af.group in ("11_group", "10_group"):
                 p = 7 if af.airfield_type == "sector_station" else 4
                 targets.append(_af_target(af_id, af, p))
+        # Aircraft factories — Adlerangriff targets production capacity
+        for tid, it in game.industrial_targets.items():
+            if it.condition > 0.1:
+                if it.target_type == "aircraft_factory":
+                    targets.append(_it_target(tid, it, 3 * it.strategic_value))
+                elif it.target_type in ("shipyard", "docks", "oil_storage"):
+                    targets.append(_it_target(tid, it, it.strategic_value))
 
     elif game.phase == GamePhase.AIRFIELD_ATTACKS:
         for af_id, af in game.airfields.items():
@@ -375,15 +391,34 @@ def _select_target(game: GameState) -> dict | None:
                 if af.group == "11_group":
                     p += 2
                 targets.append(_af_target(af_id, af, p))
+        # Continue hitting industrial targets alongside airfields
+        for tid, it in game.industrial_targets.items():
+            if it.condition > 0.1:
+                if it.target_type == "aircraft_factory":
+                    targets.append(_it_target(tid, it, 2 * it.strategic_value))
+                elif it.target_type in ("oil_storage", "railway"):
+                    targets.append(_it_target(tid, it, it.strategic_value))
 
     elif game.phase == GamePhase.LONDON_BLITZ:
         targets.append({"id": "london", "type": "city", "name": "London",
                         "priority": 8, "lat": 51.5, "lon": -0.12})
-        targets.append({"id": "london_docks", "type": "port", "name": "London Docks",
-                        "priority": 7, "lat": 51.5, "lon": 0.0})
         for af_id, af in game.airfields.items():
             if af.side == Side.RAF and af.group == "11_group":
                 targets.append(_af_target(af_id, af, 3))
+        # Blitz prioritises London and major industrial targets
+        for tid, it in game.industrial_targets.items():
+            if it.condition > 0.1:
+                if it.target_type == "docks":
+                    p = 7 * it.strategic_value if it.city == "London" else 3 * it.strategic_value
+                elif it.target_type == "power_station":
+                    p = 5 * it.strategic_value
+                elif it.target_type == "railway":
+                    p = 4 * it.strategic_value
+                elif it.target_type == "aircraft_factory":
+                    p = 3 * it.strategic_value
+                else:
+                    p = 2 * it.strategic_value
+                targets.append(_it_target(tid, it, p))
 
     if not targets:
         return None

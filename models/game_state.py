@@ -13,6 +13,7 @@ from models.pilot import Pilot, PilotTraits
 from models.squadron import Squadron
 from models.airfield import Airfield
 from models.radar import RadarStation
+from models.target import IndustrialTarget
 
 DATA_DIR = Path(__file__).parent.parent / "data"
 
@@ -89,6 +90,7 @@ class GameState:
         self.squadrons: dict[str, Squadron] = {}
         self.airfields: dict[str, Airfield] = {}
         self.radar_stations: dict[str, RadarStation] = {}
+        self.industrial_targets: dict[str, IndustrialTarget] = {}
 
         self.active_raids: list[dict] = []
         self.event_log: list[dict] = []
@@ -119,6 +121,7 @@ class GameState:
         self._load_aircraft_types()
         self._load_airfields()
         self._load_radar_stations()
+        self._load_industrial_targets()
         self._load_historical_pilots()
         self._load_raf_squadrons()
         self._load_luftwaffe_units()
@@ -208,6 +211,25 @@ class GameState:
                 station_type=info["type"],
                 range_miles=info["range_miles"],
                 min_altitude_ft=info["min_altitude_ft"],
+            )
+
+    def _load_industrial_targets(self):
+        path = DATA_DIR / "industrial_targets.json"
+        if not path.exists():
+            return
+        with open(path) as f:
+            data = json.load(f)
+        for tid, info in data.items():
+            self.industrial_targets[tid] = IndustrialTarget(
+                id=tid,
+                name=info["name"],
+                target_type=info["target_type"],
+                lat=info["lat"],
+                lon=info["lon"],
+                city=info["city"],
+                strategic_value=info["strategic_value"],
+                description=info["description"],
+                repair_rate_per_day=info.get("repair_rate_per_day", 0.05),
             )
 
     def _load_historical_pilots(self):
@@ -456,6 +478,7 @@ class GameState:
             "squadrons": {k: v.to_save_dict() for k, v in self.squadrons.items()},
             "airfields": {k: v.to_dict() for k, v in self.airfields.items()},
             "radar_stations": {k: v.to_dict() for k, v in self.radar_stations.items()},
+            "industrial_targets": {k: v.to_dict() for k, v in self.industrial_targets.items()},
             "active_raids": self.active_raids,
             "event_log": self.event_log[-200:],
             "raf_stats": self.raf_stats,
@@ -501,6 +524,8 @@ class GameState:
             gs.airfields[af_id] = Airfield.from_dict(af_data)
         for rs_id, rs_data in data["radar_stations"].items():
             gs.radar_stations[rs_id] = RadarStation.from_dict(rs_data)
+        for tid, t_data in data.get("industrial_targets", {}).items():
+            gs.industrial_targets[tid] = IndustrialTarget.from_dict(t_data)
 
         return gs
 
