@@ -304,6 +304,8 @@ function updateSquadronList() {
 
         const patrolBadge = sqn.patrol_sector
             ? `<span class="patrol-badge">📡 ${sqn.patrol_sector.replace(/_/g," ")}</span>` : "";
+        const baseName = (state.airfields && sqn.current_base && state.airfields[sqn.current_base])
+            ? state.airfields[sqn.current_base].name : (sqn.current_base || "");
         return `<div class="sqn-item ${sideClass}">
             <div class="sqn-header">
                 <span class="sqn-name">${sqn.name}</span>
@@ -314,6 +316,7 @@ function updateSquadronList() {
                 <span>AC: ${sqn.operational_aircraft ?? "?"}/${sqn.aircraft_count}</span>
                 <span>Pilots: ${sqn.available_pilots ?? "?"}/${sqn.pilot_count}</span>
             </div>
+            ${baseName ? `<div class="sqn-base">📍 ${baseName}</div>` : ""}
             ${patrolBadge}
         </div>`;
     }).join("");
@@ -1124,6 +1127,22 @@ function buildSelectionHtml(type, item) {
         const sideLabel = item.side === "raf" ? "RAF" : "Luftwaffe";
         const orderBtn = (item.side === "raf" && playerSide === "raf")
             ? `<button class="sel-action-btn" onclick="focusAirfieldOrders('${item.id}')">Go to Orders</button>` : "";
+
+        const sqnIds = item.squadron_ids || [];
+        const sqnsHtml = sqnIds.length === 0 ? `<div class="sel-sqn-empty">No squadrons based here</div>` :
+            sqnIds.map(sid => {
+                const sqn = state.squadrons && state.squadrons[sid];
+                if (!sqn) return "";
+                const scrambleBtn = (playerSide === "raf" && sqn.side === "raf" && sqn.can_scramble)
+                    ? `<button class="sel-sqn-scramble" onclick="quickScramble('${sid}')">↑</button>` : "";
+                return `<div class="sel-sqn-row">
+                    <span class="sel-sqn-name">${sqn.name}</span>
+                    <span class="sel-sqn-state state-${sqn.state}">${sqn.state}</span>
+                    <span class="sel-sqn-ac">${sqn.operational_aircraft ?? "?"}ac</span>
+                    ${scrambleBtn}
+                </div>`;
+            }).join("");
+
         return `<div class="sel-header"><span class="sel-title">${item.name}</span>${X}</div>
         <div class="sel-body">
             <div class="sel-row"><span>Side</span><span>${sideLabel}</span></div>
@@ -1132,7 +1151,7 @@ function buildSelectionHtml(type, item) {
             <div class="sel-row"><span>Runway</span><span>${rwy}%</span></div>
             <div class="sel-row"><span>Fuel</span><span>${fuel}%</span></div>
             <div class="sel-row"><span>Ammo</span><span>${ammo}%</span></div>
-            <div class="sel-row"><span>Squadrons</span><span>${(item.squadron_ids||[]).length}</span></div>
+            <div class="sel-sqn-section"><div class="sel-sqn-header">Squadrons (${sqnIds.length})</div>${sqnsHtml}</div>
             ${orderBtn}
         </div>`;
     }
@@ -1213,6 +1232,18 @@ function scrambleAgainstRaid(raidId) {
             if (opt.value === raidId) { opt.selected = true; break; }
         }
     }
+    dismissMapSelection();
+}
+
+async function quickScramble(squadronId) {
+    await fetch("/api/scramble", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ squadron_id: squadronId, raid_id: null }),
+    });
+    const res = await fetch("/api/state");
+    state = await res.json();
+    updateUI();
     dismissMapSelection();
 }
 
