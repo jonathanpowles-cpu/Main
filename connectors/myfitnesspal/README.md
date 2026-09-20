@@ -46,7 +46,18 @@ Cookies expire; if you see `MFPAuthError`, log in again and re-export.
 
 ### Register as a Claude connector
 
-Add to your Claude Code / Claude Desktop MCP config:
+The server runs locally on the machine where Claude Desktop or Claude Code
+runs, so install it there:
+
+```bash
+git clone https://github.com/jonathanpowles-cpu/Main.git
+cd Main
+pip install -r connectors/myfitnesspal/requirements.txt
+```
+
+**Claude Desktop** — add to `claude_desktop_config.json`
+(macOS: `~/Library/Application Support/Claude/`, Windows: `%APPDATA%\Claude\`),
+using the absolute path of your clone for `PYTHONPATH`:
 
 ```json
 {
@@ -54,11 +65,23 @@ Add to your Claude Code / Claude Desktop MCP config:
     "myfitnesspal": {
       "command": "python",
       "args": ["-m", "connectors.myfitnesspal", "serve"],
-      "cwd": "/path/to/this/repo",
-      "env": { "MFP_COOKIE_HEADER": "…" }
+      "env": {
+        "PYTHONPATH": "/path/to/Main",
+        "MFP_COOKIE_HEADER": "…"
+      }
     }
   }
 }
+```
+
+Restart Claude Desktop; the connector appears under the tools menu.
+
+**Claude Code** — from any directory:
+
+```bash
+claude mcp add myfitnesspal \
+    -e PYTHONPATH=/path/to/Main -e MFP_COOKIE_HEADER="…" \
+    -- python -m connectors.myfitnesspal serve
 ```
 
 Then, in a chat, attach a photo of the label and say
