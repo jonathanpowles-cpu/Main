@@ -8,9 +8,11 @@ from the photo itself and passes the values to these tools.
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urlparse
 
 from pydantic import BaseModel, Field, model_validator
 
+from .auth import SCOPE, PasswordAuthProvider
 from .mfp_client import FoodSpec, MFPClient
 from .nutrition import NutritionFacts, derive_serving_weight_g, kj_to_kcal, parse_label
 
@@ -83,16 +85,52 @@ def build_spec(
     )
 
 
-def create_server(client_factory=MFPClient.from_env):
-    """Build the MCP server. ``client_factory`` is injectable for tests."""
+def create_server(client_factory=MFPClient.from_env, auth: PasswordAuthProvider | None = None):
+    """Build the MCP server.
+
+    ``client_factory`` is injectable for tests. Pass ``auth`` to protect the
+    HTTP transport with the password-guarded OAuth server (required for
+    hosted use); stdio needs no auth.
+    """
+    from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
     from mcp.server.mcpserver import MCPServer
+    from starlette.requests import Request
+    from starlette.responses import JSONResponse, PlainTextResponse
+
+    auth_kwargs: dict[str, Any] = {}
+    if auth is not None:
+        auth_kwargs = {
+            "auth_server_provider": auth,
+            "auth": AuthSettings(
+                issuer_url=auth.public_url,
+                resource_server_url=f"{auth.public_url}/mcp",
+                client_registration_options=ClientRegistrationOptions(
+                    enabled=True, valid_scopes=[SCOPE], default_scopes=[SCOPE]
+                ),
+                required_scopes=[SCOPE],
+                validate_token_resource=False,
+            ),
+        }
 
     server = MCPServer(
         name="myfitnesspal-nutrients",
         title="MyFitnessPal Nutrient Connector",
         instructions=INSTRUCTIONS,
         version="0.1.0",
+        **auth_kwargs,
     )
+
+    @server.custom_route("/", methods=["GET"])
+    async def index(_: Request) -> PlainTextResponse:
+        return PlainTextResponse("MyFitnessPal nutrient connector. MCP endpoint: /mcp\n")
+
+    @server.custom_route("/health", methods=["GET"])
+    async def health(_: Request) -> JSONResponse:
+        return JSONResponse({"status": "ok"})
+
+    if auth is not None:
+        server.custom_route("/login", methods=["GET"])(auth.login_page)
+        server.custom_route("/login", methods=["POST"])(auth.login_submit)
 
     @server.tool()
     def parse_nutrition_label(label_text: str) -> dict[str, Any]:
@@ -147,6 +185,21 @@ def create_server(client_factory=MFPClient.from_env):
         return client_factory().create_food(spec)
 
     return server
+
+
+def run_http(server, public_url: str, host: str = "0.0.0.0", port: int = 8000) -> None:
+    """Serve over Streamable HTTP, accepting only requests addressed to ``public_url``."""
+    import uvicorn
+    from mcp.server.transport_security import TransportSecuritySettings
+
+    public_host = urlparse(public_url).netloc
+    security = TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=[public_host, f"{public_host}:*", "localhost:*", "127.0.0.1:*"],
+        allowed_origins=[public_url.rstrip("/"), "http://localhost:*", "http://127.0.0.1:*"],
+    )
+    app = server.streamable_http_app(host=host, transport_security=security)
+    uvicorn.run(app, host=host, port=port, log_level="info")
 
 
 def main() -> None:

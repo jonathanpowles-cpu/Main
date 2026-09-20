@@ -131,6 +131,9 @@ MyFitnessPal from a nutrition panel. MyFitnessPal has no public API; the client
 uses the website's private endpoints with browser session cookies
 (`MFP_COOKIE_HEADER` / `MFP_COOKIES_FILE`). Keep the request shapes in
 `mfp_client.py` only, so they are easy to update if the endpoints change.
+For claude.ai it runs hosted (`serve --transport http`, second service in
+`render.yaml`) behind the password OAuth server in `auth.py`; never expose the
+HTTP transport without it.
 
 ## Code Style & Conventions
 

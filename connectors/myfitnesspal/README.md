@@ -89,6 +89,49 @@ Then, in a chat, attach a photo of the label and say
 Claude will call `preview_food`, show you the values, and call `create_food`
 once you confirm.
 
+### Use it in the claude.ai web and mobile apps (hosted)
+
+The web app can only reach a server on the public internet, so run the
+connector as a small HTTPS service. It ships with a password-protected OAuth
+login, which is what claude.ai custom connectors expect; nobody without the
+password can use your MyFitnessPal cookies through it.
+
+**Deploy on Render (one click, free tier)** — `render.yaml` in the repo root
+already defines an `mfp-connector` web service. In the Render dashboard create
+a Blueprint from this repo, then set these environment variables on the
+service:
+
+| Variable | Value |
+|----------|-------|
+| `CONNECTOR_PASSWORD` | The password you will type when connecting from Claude |
+| `CONNECTOR_SECRET` | Any long random string. Signs tokens so a redeploy does not disconnect Claude |
+| `MFP_COOKIE_HEADER` | Your MyFitnessPal `Cookie` header (see above) |
+
+Render sets `PORT` and `RENDER_EXTERNAL_URL` itself; the server uses them.
+
+**Deploy anywhere else** — build the Docker image from the repo root and run it
+with the same variables plus `PUBLIC_URL` (the HTTPS address it is served at):
+
+```bash
+docker build -f connectors/myfitnesspal/Dockerfile -t mfp-connector .
+docker run -p 8000:8000 -e PUBLIC_URL=https://mfp.example.com \
+    -e CONNECTOR_PASSWORD=… -e CONNECTOR_SECRET=… -e MFP_COOKIE_HEADER=… mfp-connector
+```
+
+Or without Docker: `python -m connectors.myfitnesspal serve --transport http
+--public-url https://mfp.example.com`. The server refuses to start over HTTP
+without `CONNECTOR_PASSWORD`. Put TLS in front of it (Render does this for you).
+
+**Add it to Claude** — in claude.ai go to Settings → Connectors → Add custom
+connector, enter `https://<your-host>/mcp`, and leave the OAuth client fields
+empty (the server supports dynamic registration). Click Connect, enter your
+connector password on the login page, and the tools appear in every chat,
+including the mobile apps.
+
+Endpoints: `/mcp` (MCP, Streamable HTTP), `/health`, `/login`, and the
+standard OAuth ones (`/.well-known/oauth-authorization-server`, `/register`,
+`/authorize`, `/token`).
+
 ## Tools
 
 | Tool | Purpose |
@@ -130,4 +173,8 @@ python -m connectors.myfitnesspal create --name "Beef & garlic rice bowl" \
   notice; the request shapes live in `mfp_client.py` and are easy to adjust.
 - Only the HTTP calls are unverified against the live service; the
   payload mapping, parsing and auth flow are covered by `tests/test_mfp_*.py`
-  and `tests/test_nutrition.py` with mocked HTTP.
+  and `tests/test_nutrition.py` with mocked HTTP. The hosted OAuth flow is
+  tested end to end in `tests/test_mfp_auth.py`.
+- Hosted mode keeps your MyFitnessPal cookies in the host's environment
+  variables. Rotate them (re-export from the browser) when they expire, and
+  change `CONNECTOR_PASSWORD` if you think it has leaked.

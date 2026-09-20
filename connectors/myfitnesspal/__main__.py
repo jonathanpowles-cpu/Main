@@ -14,14 +14,19 @@ Examples::
         --brand HelloFresh --kj 2680 --protein 36.9 --fat 22.2 --saturated 9.4 \
         --carbs 70.7 --sugars 9 --sodium 1580 --fibre 8.5
 
-    # Run as an MCP server over stdio
+    # Run as an MCP server over stdio (Claude Desktop / Claude Code)
     python -m connectors.myfitnesspal serve
+
+    # Run as a hosted HTTPS connector for claude.ai (needs CONNECTOR_PASSWORD,
+    # PUBLIC_URL and the MFP cookie variables in the environment)
+    python -m connectors.myfitnesspal serve --transport http --port 8000
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 
 from .mfp_client import FoodSpec, MFPClient, MFPError
@@ -77,18 +82,44 @@ def build_parser() -> argparse.ArgumentParser:
         p_create.add_argument(flag, dest=dest, type=float, default=None, help=help_text)
     p_create.add_argument("--dry-run", action="store_true", help="print the payload instead of sending it")
 
-    sub.add_parser("serve", help="run the MCP server on stdio")
+    p_serve = sub.add_parser("serve", help="run the MCP server")
+    p_serve.add_argument("--transport", choices=["stdio", "http"], default="stdio")
+    p_serve.add_argument("--host", default="0.0.0.0", help="bind address for http (default: 0.0.0.0)")
+    p_serve.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")), help="port for http (default: $PORT or 8000)")
+    p_serve.add_argument(
+        "--public-url",
+        default=os.environ.get("PUBLIC_URL") or os.environ.get("RENDER_EXTERNAL_URL"),
+        help="public https URL of this server (default: $PUBLIC_URL or $RENDER_EXTERNAL_URL)",
+    )
     return parser
+
+
+def _serve(args: argparse.Namespace) -> int:
+    from .server import create_server, run_http
+
+    if args.transport == "stdio":
+        create_server().run(transport="stdio")
+        return 0
+
+    from .auth import PasswordAuthProvider
+
+    password = os.environ.get("CONNECTOR_PASSWORD")
+    if not password:
+        print("error: CONNECTOR_PASSWORD must be set to serve over http (it protects your MFP cookies)", file=sys.stderr)
+        return 2
+    if not args.public_url:
+        print("error: --public-url (or $PUBLIC_URL) is required to serve over http", file=sys.stderr)
+        return 2
+    auth = PasswordAuthProvider(password, args.public_url, secret=os.environ.get("CONNECTOR_SECRET"))
+    run_http(create_server(auth=auth), public_url=args.public_url, host=args.host, port=args.port)
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     if args.command == "serve":
-        from .server import main as serve
-
-        serve()
-        return 0
+        return _serve(args)
 
     if args.command == "parse":
         print(json.dumps(parse_label(_read_text(args.label)).to_dict(), indent=2))
