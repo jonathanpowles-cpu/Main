@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 from pydantic import BaseModel, Field, model_validator
 
 from .auth import SCOPE, PasswordAuthProvider
+from .links import FoodLinks
 from .mfp_client import FoodSpec, MFPClient
 from .nutrition import NutritionFacts, derive_serving_weight_g, kj_to_kcal, parse_label
 
@@ -30,6 +31,11 @@ Workflow:
 
 If the label has a "per 100 g" column, pass it as per_100g so the serving
 weight can be derived and the food can also be logged by weight.
+
+If the user is on their phone or asks for a link, call create_food_link
+instead (when available): it returns a page they can open on the phone to add
+the food, or paste into the MyFitnessPal app's "Import from web". Pass the
+recipe's ingredient lines too if they are visible.
 """
 
 
@@ -131,6 +137,25 @@ def create_server(client_factory=MFPClient.from_env, auth: PasswordAuthProvider 
     if auth is not None:
         server.custom_route("/login", methods=["GET"])(auth.login_page)
         server.custom_route("/login", methods=["POST"])(auth.login_submit)
+
+        links = FoodLinks(auth, client_factory=client_factory)
+        server.custom_route("/food/{token}", methods=["GET"])(links.food_page)
+        server.custom_route("/food/{token}/add", methods=["POST"])(links.add_food)
+
+        @server.tool()
+        def create_food_link(
+            name: str,
+            nutrition: NutritionInput,
+            brand: str | None = None,
+            ingredients: list[str] | None = None,
+            serving_description: str = "serving",
+            per_100g: NutritionInput | None = None,
+            country_code: str = "AU",
+        ) -> dict[str, Any]:
+            """Make a shareable link for this food. Opening it on a phone shows the nutrients with an "Add to MyFitnessPal" button, and the page can be pasted into the MyFitnessPal app's Recipes > Import from web. Creates nothing until the user acts."""
+            spec = build_spec(name, nutrition, brand, serving_description, per_100g, country_code)
+            url = links.make(spec, ingredients)
+            return {"url": url, "nutrition": spec.nutrition.to_dict(), "ingredients": ingredients or []}
 
     @server.tool()
     def parse_nutrition_label(label_text: str) -> dict[str, Any]:

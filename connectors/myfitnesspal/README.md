@@ -132,6 +132,26 @@ Endpoints: `/mcp` (MCP, Streamable HTTP), `/health`, `/login`, and the
 standard OAuth ones (`/.well-known/oauth-authorization-server`, `/register`,
 `/authorize`, `/token`).
 
+### On your phone: one link per food
+
+Once the connector is hosted, ask Claude (web, desktop or mobile) for a link
+instead of a direct create. It calls `create_food_link`, which encodes the
+food in a short signed URL like `https://<your-host>/food/z…`. Nothing is
+stored on the server. Opening the link on your phone shows the nutrients and
+gives you two ways in:
+
+1. **Add to My Foods** — type the connector password and tap the button. The
+   food is created in your account and shows up under *My Foods* in the app.
+2. **Recipes → Create a Recipe → Import from web** in the MyFitnessPal app,
+   pasting the link. The page carries schema.org `Recipe` data (ingredients,
+   yield and per-serving nutrition) for the importer. MyFitnessPal's importer
+   matches ingredient lines against its database, so give Claude the recipe's
+   ingredient list as well for best results.
+
+From the CLI the same link comes from `create … --link`, with
+`--ingredient "…"` repeated per line and `PUBLIC_URL`, `CONNECTOR_PASSWORD`
+and `CONNECTOR_SECRET` set.
+
 ## Tools
 
 | Tool | Purpose |
@@ -140,6 +160,7 @@ standard OAuth ones (`/.well-known/oauth-authorization-server`, `/register`,
 | `preview_food(name, nutrition, brand?, serving_description?, per_100g?, country_code?)` | Show the exact request body and a manual-entry list. Sends nothing |
 | `create_food(…same args…)` | Create the food in MyFitnessPal |
 | `create_food_from_label(name, label_text, brand?, …)` | Parse and create in one step |
+| `create_food_link(name, nutrition, brand?, ingredients?, …)` | Hosted mode only: return a phone-friendly link for the food (see above) |
 
 `nutrition` takes the per-serving values: `calories` or `energy_kj` (one is
 required), `protein_g`, `fat_g`, `saturated_fat_g`, `trans_fat_g`,

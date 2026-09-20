@@ -25,6 +25,7 @@ import html
 import json
 import secrets
 import time
+import zlib
 from typing import Any
 
 from pydantic import AnyUrl
@@ -60,6 +61,42 @@ def _hash(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
+class Signer:
+    """HMAC-SHA256 signed JSON blobs: ``<body>.<signature>``.
+
+    A ``z`` marker before the body means it is zlib-compressed, which keeps
+    shareable food links short.
+    """
+
+    def __init__(self, secret: str) -> None:
+        self._key = hashlib.sha256(f"mfp-connector:{secret}".encode()).digest()
+
+    def sign(self, payload: dict[str, Any], compress: bool = False) -> str:
+        raw = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()
+        body = ("z" + _b64(zlib.compress(raw, 9))) if compress else _b64(raw)
+        sig = _b64(hmac.new(self._key, body.encode(), hashlib.sha256).digest())
+        return f"{body}.{sig}"
+
+    def hmac_hex(self, message: str) -> str:
+        return hmac.new(self._key, message.encode(), hashlib.sha256).hexdigest()
+
+    def verify(self, token: str, kind: str) -> dict[str, Any] | None:
+        try:
+            body, sig = token.split(".", 1)
+            expected = _b64(hmac.new(self._key, body.encode(), hashlib.sha256).digest())
+            if not hmac.compare_digest(sig, expected):
+                return None
+            raw = zlib.decompress(_unb64(body[1:])) if body.startswith("z") else _unb64(body)
+            payload = json.loads(raw)
+        except (ValueError, TypeError, zlib.error):
+            return None
+        if not isinstance(payload, dict) or payload.get("k") != kind:
+            return None
+        if payload.get("exp") is not None and payload["exp"] < time.time():
+            return None
+        return payload
+
+
 class PasswordAuthProvider:
     """``OAuthAuthorizationServerProvider`` guarded by a single password."""
 
@@ -68,32 +105,21 @@ class PasswordAuthProvider:
             raise ValueError("A non-empty password is required")
         self._password = password
         self.public_url = public_url.rstrip("/")
-        self._key = hashlib.sha256(f"mfp-connector:{secret or password}".encode()).digest()
+        self.signer = Signer(secret or password)
         self._clients: dict[str, OAuthClientInformationFull] = {}
         self._used_codes: set[str] = set()
         self._revoked: set[str] = set()
 
+    def check_password(self, candidate: str) -> bool:
+        return hmac.compare_digest(candidate.encode(), self._password.encode())
+
     # -- signed blobs ---------------------------------------------------------
 
     def _sign(self, payload: dict[str, Any]) -> str:
-        body = _b64(json.dumps(payload, separators=(",", ":"), sort_keys=True).encode())
-        sig = _b64(hmac.new(self._key, body.encode(), hashlib.sha256).digest())
-        return f"{body}.{sig}"
+        return self.signer.sign(payload)
 
     def _verify(self, token: str, kind: str) -> dict[str, Any] | None:
-        try:
-            body, sig = token.split(".", 1)
-            expected = _b64(hmac.new(self._key, body.encode(), hashlib.sha256).digest())
-            if not hmac.compare_digest(sig, expected):
-                return None
-            payload = json.loads(_unb64(body))
-        except (ValueError, TypeError):
-            return None
-        if payload.get("k") != kind:
-            return None
-        if payload.get("exp") is not None and payload["exp"] < time.time():
-            return None
-        return payload
+        return self.signer.verify(token, kind)
 
     # -- clients (dynamic registration) --------------------------------------
 
@@ -124,7 +150,7 @@ class PasswordAuthProvider:
         self._clients[client_info.client_id] = client_info
 
     def _client_secret(self, client_id: str) -> str:
-        return hmac.new(self._key, f"secret:{client_id}".encode(), hashlib.sha256).hexdigest()
+        return self.signer.hmac_hex(f"secret:{client_id}")
 
     # -- authorization --------------------------------------------------------
 
@@ -148,7 +174,7 @@ class PasswordAuthProvider:
     async def login_page(self, request: Request) -> Response:
         txn = request.query_params.get("txn", "")
         if self._verify(txn, "txn") is None:
-            return HTMLResponse(_page("This sign-in link is invalid or has expired. Start again from Claude."), 400)
+            return HTMLResponse(page("This sign-in link is invalid or has expired. Start again from Claude."), 400)
         return HTMLResponse(_login_form(txn, self._verify(txn, "txn")["client_name"]))
 
     async def login_submit(self, request: Request) -> Response:
@@ -156,9 +182,8 @@ class PasswordAuthProvider:
         txn = str(form.get("txn", ""))
         payload = self._verify(txn, "txn")
         if payload is None:
-            return HTMLResponse(_page("This sign-in link is invalid or has expired. Start again from Claude."), 400)
-        password = str(form.get("password", ""))
-        if not hmac.compare_digest(password.encode(), self._password.encode()):
+            return HTMLResponse(page("This sign-in link is invalid or has expired. Start again from Claude."), 400)
+        if not self.check_password(str(form.get("password", ""))):
             return HTMLResponse(_login_form(txn, payload["client_name"], error="Wrong password."), 401)
         code = self._sign(
             {
@@ -263,7 +288,7 @@ input{background:#111;color:#eee;margin:.75rem 0}button{background:#3b82f6;color
 """
 
 
-def _page(body_html: str) -> str:
+def page(body_html: str) -> str:
     return f"<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'>" \
            f"<title>MyFitnessPal connector</title><style>{_STYLE}</style></head><body><main>{body_html}</main></body></html>"
 
@@ -271,7 +296,7 @@ def _page(body_html: str) -> str:
 def _login_form(txn: str, client_name: str, error: str | None = None) -> str:
     who = html.escape(client_name) if client_name else "An application"
     err = f"<p class='err'>{html.escape(error)}</p>" if error else ""
-    return _page(
+    return page(
         f"<h1>MyFitnessPal connector</h1><p>{who} wants to create foods in your MyFitnessPal account.</p>"
         f"{err}<form method='post' action='/login'><input type='hidden' name='txn' value='{html.escape(txn)}'>"
         f"<input type='password' name='password' placeholder='Connector password' autofocus required>"

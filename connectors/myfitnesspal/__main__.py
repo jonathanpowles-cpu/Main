@@ -81,6 +81,13 @@ def build_parser() -> argparse.ArgumentParser:
     for flag, dest, help_text in _NUTRIENT_ARGS:
         p_create.add_argument(flag, dest=dest, type=float, default=None, help=help_text)
     p_create.add_argument("--dry-run", action="store_true", help="print the payload instead of sending it")
+    p_create.add_argument(
+        "--link",
+        action="store_true",
+        help="print a shareable food link for the hosted service instead of creating the food "
+        "(needs PUBLIC_URL and CONNECTOR_PASSWORD / CONNECTOR_SECRET)",
+    )
+    p_create.add_argument("--ingredient", action="append", default=[], help="ingredient line for the link page (repeatable)")
 
     p_serve = sub.add_parser("serve", help="run the MCP server")
     p_serve.add_argument("--transport", choices=["stdio", "http"], default="stdio")
@@ -134,6 +141,18 @@ def main(argv: list[str] | None = None) -> int:
     )
     if args.dry_run:
         print(json.dumps(MFPClient(cookies={}).preview(spec), indent=2))
+        return 0
+    if args.link:
+        from .auth import PasswordAuthProvider
+        from .links import FoodLinks
+
+        public_url = os.environ.get("PUBLIC_URL") or os.environ.get("RENDER_EXTERNAL_URL")
+        password = os.environ.get("CONNECTOR_PASSWORD")
+        if not public_url or not password:
+            print("error: --link needs PUBLIC_URL and CONNECTOR_PASSWORD in the environment", file=sys.stderr)
+            return 2
+        auth = PasswordAuthProvider(password, public_url, secret=os.environ.get("CONNECTOR_SECRET"))
+        print(FoodLinks(auth).make(spec, args.ingredient))
         return 0
     try:
         result = MFPClient.from_env().create_food(spec)
