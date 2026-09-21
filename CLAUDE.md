@@ -51,6 +51,8 @@ python run.py
 │   ├── airfield.py            # Airfield damage, repair, fuel/ammo supply
 │   ├── radar.py               # Chain Home / Chain Home Low radar stations
 │   └── game_state.py          # GameState container — loads all data, tracks stats
+├── connectors/
+│   └── myfitnesspal/          # Standalone MCP connector: nutrition label -> MyFitnessPal food (see its README)
 ├── data/
 │   ├── aircraft_types.json    # 11 aircraft types with historical specs
 │   ├── raf_squadrons.json     # 54 RAF Fighter Command squadrons (July 1940 OOB)
@@ -58,7 +60,10 @@ python run.py
 │   ├── airfields.json         # 51 airfields (34 RAF + 17 Luftwaffe)
 │   └── radar_stations.json    # 22 radar stations (17 CH + 5 CHL)
 └── tests/
-    └── __init__.py
+    ├── __init__.py
+    ├── test_nutrition.py      # Connector: label parsing
+    ├── test_mfp_client.py     # Connector: MFP payload/client (HTTP mocked)
+    └── test_mfp_server.py     # Connector: MCP tools
 ```
 
 ## Architecture
@@ -113,8 +118,22 @@ No build step needed — Flask serves static files directly.
 ## Testing
 
 ```bash
-python -m pytest tests/    # Run test suite (tests are minimal currently)
+python -m pytest tests/    # Run test suite
 ```
+
+The MyFitnessPal connector tests need `pip install -r connectors/myfitnesspal/requirements.txt`.
+
+## MyFitnessPal connector
+
+`connectors/myfitnesspal/` is independent of the game. It is an MCP server
+(`python -m connectors.myfitnesspal serve`) that creates custom foods in
+MyFitnessPal from a nutrition panel. MyFitnessPal has no public API; the client
+uses the website's private endpoints with browser session cookies
+(`MFP_COOKIE_HEADER` / `MFP_COOKIES_FILE`). Keep the request shapes in
+`mfp_client.py` only, so they are easy to update if the endpoints change.
+For claude.ai it runs hosted (`serve --transport http`, second service in
+`render.yaml`) behind the password OAuth server in `auth.py`; never expose the
+HTTP transport without it.
 
 ## Code Style & Conventions
 

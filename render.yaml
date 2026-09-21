@@ -8,3 +8,22 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
+
+  # Hosted MyFitnessPal connector for claude.ai (see connectors/myfitnesspal/README.md).
+  # Set CONNECTOR_PASSWORD, CONNECTOR_SECRET and MFP_COOKIE_HEADER in the Render dashboard.
+  - type: web
+    name: mfp-connector
+    runtime: python
+    buildCommand: pip install -r connectors/myfitnesspal/requirements.txt
+    startCommand: python -m connectors.myfitnesspal serve --transport http
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: CONNECTOR_PASSWORD
+        sync: false
+      - key: CONNECTOR_SECRET
+        sync: false
+      - key: MFP_COOKIE_HEADER
+        sync: false
