@@ -29,7 +29,7 @@ photo of label ──► Claude reads "per serving" column
 ## Setup
 
 ```bash
-pip install -r connectors/myfitnesspal/requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Authentication
@@ -52,7 +52,7 @@ runs, so install it there:
 ```bash
 git clone https://github.com/jonathanpowles-cpu/Main.git
 cd Main
-pip install -r connectors/myfitnesspal/requirements.txt
+pip install -r requirements.txt
 ```
 
 **Claude Desktop** — add to `claude_desktop_config.json`

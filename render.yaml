@@ -1,20 +1,8 @@
 services:
   - type: web
-    name: battle-of-britain
-    runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app --bind 0.0.0.0:$PORT
-    plan: free
-    envVars:
-      - key: PYTHON_VERSION
-        value: "3.11"
-
-  # Hosted MyFitnessPal connector for claude.ai (see connectors/myfitnesspal/README.md).
-  # Set CONNECTOR_PASSWORD, CONNECTOR_SECRET and MFP_COOKIE_HEADER in the Render dashboard.
-  - type: web
     name: mfp-connector
     runtime: python
-    buildCommand: pip install -r connectors/myfitnesspal/requirements.txt
+    buildCommand: pip install -r requirements.txt
     startCommand: python -m connectors.myfitnesspal serve --transport http
     healthCheckPath: /health
     plan: free
