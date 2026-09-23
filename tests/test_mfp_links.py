@@ -6,7 +6,7 @@ import re
 from starlette.testclient import TestClient
 
 from connectors.myfitnesspal.auth import PasswordAuthProvider
-from connectors.myfitnesspal.links import FoodLinks
+from connectors.myfitnesspal.links import FoodLinks, render_food_page
 from connectors.myfitnesspal.mfp_client import FoodSpec
 from connectors.myfitnesspal.nutrition import NutritionFacts
 from connectors.myfitnesspal.server import create_server
@@ -115,3 +115,17 @@ def test_stdio_server_has_no_link_tool():
 
     names = {t.name for t in asyncio.run(create_server(client_factory=RecordingClient).list_tools())}
     assert "create_food_link" not in names
+
+
+def test_serving_line_shows_derived_weight():
+    spec = _spec()
+    assert spec.nutrition.serving_weight_g == 432
+    page = render_food_page(spec, [], "http://localhost/food/x")
+    assert "<p>Per 1 serving (432 g)</p>" in page
+
+
+def test_serving_line_omits_weight_when_unknown():
+    spec = _spec()
+    spec.nutrition.serving_weight_g = None
+    page = render_food_page(spec, [], "http://localhost/food/x")
+    assert "<p>Per 1 serving</p>" in page

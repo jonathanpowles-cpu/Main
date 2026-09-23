@@ -151,9 +151,15 @@ def render_food_page(spec: FoodSpec, ingredients: list[str], url: str, error: st
     brand = f"<p>{html.escape(spec.brand)}</p>" if spec.brand else ""
     err = f"<p class='err'>{html.escape(error)}</p>" if error else ""
     json_ld = json.dumps(recipe_json_ld(spec, ingredients, url)).replace("</", "<\\/")
+    serving = f"Per {spec.serving_quantity:g} {html.escape(spec.serving_description)}"
+    weight = spec.nutrition.serving_weight_g
+    if weight:
+        # The label rarely prints the serving weight, so show the derived one:
+        # it tells the reader whether their portion matched the card.
+        serving += f" ({weight:g} g)"
     body = (
         f"<h1>{title}</h1>{brand}"
-        f"<p>Per {spec.serving_quantity:g} {html.escape(spec.serving_description)}</p>"
+        f"<p>{serving}</p>"
         f"<table>{rows}</table>{ingredient_html}"
         f"<h2>Add to MyFitnessPal</h2>{err}"
         f"<form method='post' action='{html.escape(url)}/add'>"
