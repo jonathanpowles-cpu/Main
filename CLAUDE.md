@@ -4,9 +4,12 @@ This file provides context for AI assistants working on this repository.
 
 ## Repository
 
-- **Name**: Battle of Britain — Operational Simulation
+- **Name**: MyFitnessPal nutrient connector
 - **Owner**: jonathanpowles-cpu
-- **Description**: A strategic/operational simulation of the Battle of Britain (July–October 1940), playable as either RAF Fighter Command or Luftwaffe
+- **Description**: An MCP server and CLI that turns a nutrition information panel (a meal-kit recipe card, a packet label) into a private custom food in MyFitnessPal
+
+This repository previously also held a Battle of Britain simulation. That game
+was removed; see **Repository history** below for where it lives now.
 
 ## Development Setup
 
@@ -19,136 +22,114 @@ This file provides context for AI assistants working on this repository.
 
 ```bash
 pip install -r requirements.txt
-python run.py
-# Open http://localhost:5000
+python -m connectors.myfitnesspal serve            # MCP server on stdio
+python -m connectors.myfitnesspal parse label.txt  # parse a panel, print JSON
 ```
+
+See `connectors/myfitnesspal/README.md` for install, hosting and phone usage.
 
 ## Project Structure
 
 ```
 .
 ├── CLAUDE.md                  # AI assistant guidance (this file)
-├── requirements.txt           # Python dependencies (Flask)
-├── run.py                     # Entry point — starts Flask dev server on port 5000
-├── app/
-│   ├── __init__.py            # Flask app factory (create_app)
-│   ├── routes.py              # API endpoints and page routes
-│   ├── templates/
-│   │   └── index.html         # Single-page game UI
-│   └── static/
-│       ├── css/style.css      # Dark-themed military UI styles
-│       └── js/game.js         # Frontend: map rendering, UI updates, API calls
-├── simulation/
-│   ├── engine.py              # Core GameEngine — turn processing, player commands
-│   ├── combat.py              # Air combat resolution (fighter vs fighter, bomber attacks)
-│   ├── weather.py             # Weather system with Markov chain transitions
-│   └── ai.py                  # AI opponent logic — raid generation, RAF intercepts, radar detection
-├── models/
-│   ├── enums.py               # All enumerations (Side, AircraftStatus, GamePhase, etc.)
-│   ├── aircraft.py            # AircraftType specs and Aircraft instances
-│   ├── pilot.py               # Pilot with experience, fatigue, morale, status
-│   ├── squadron.py            # Squadron management and sortie strength
-│   ├── airfield.py            # Airfield damage, repair, fuel/ammo supply
-│   ├── radar.py               # Chain Home / Chain Home Low radar stations
-│   └── game_state.py          # GameState container — loads all data, tracks stats
+├── requirements.txt           # Python dependencies (mcp, requests, pydantic, uvicorn)
+├── render.yaml                # Render blueprint for the hosted connector
 ├── connectors/
-│   └── myfitnesspal/          # Standalone MCP connector: nutrition label -> MyFitnessPal food (see its README)
-├── data/
-│   ├── aircraft_types.json    # 11 aircraft types with historical specs
-│   ├── raf_squadrons.json     # 54 RAF Fighter Command squadrons (July 1940 OOB)
-│   ├── luftwaffe_units.json   # 33 Luftwaffe Geschwader (July 1940 OOB)
-│   ├── airfields.json         # 51 airfields (34 RAF + 17 Luftwaffe)
-│   └── radar_stations.json    # 22 radar stations (17 CH + 5 CHL)
+│   └── myfitnesspal/
+│       ├── README.md          # Install, auth, hosting, phone links, tools, CLI
+│       ├── __main__.py        # CLI: parse / create / serve
+│       ├── nutrition.py       # NutritionFacts model, unit handling, label parsing
+│       ├── mfp_client.py      # MyFitnessPal client: cookies -> token -> create food
+│       ├── server.py          # MCP server and its tools
+│       ├── auth.py            # Password-guarded OAuth 2.1 server for hosted mode
+│       ├── links.py           # Shareable per-food links and their phone page
+│       └── Dockerfile         # Build from the repo root
 └── tests/
-    ├── __init__.py
-    ├── test_nutrition.py      # Connector: label parsing
-    ├── test_mfp_client.py     # Connector: MFP payload/client (HTTP mocked)
-    └── test_mfp_server.py     # Connector: MCP tools
+    ├── test_nutrition.py      # Label parsing and unit conversion
+    ├── test_mfp_client.py     # Payload building and client (HTTP mocked)
+    ├── test_mfp_server.py     # MCP tools
+    ├── test_mfp_auth.py       # Hosted OAuth flow end to end
+    └── test_mfp_links.py      # Shareable food links and the phone page
 ```
 
 ## Architecture
 
-### Backend (Python / Flask)
+MyFitnessPal has **no public API**. The client uses the website's private flow
+with the cookies of a logged-in browser session:
 
-- **GameEngine** (`simulation/engine.py`) orchestrates the game loop: weather, phase updates, repairs, production, AI raids, combat resolution, aircraft return
-- **GameState** (`models/game_state.py`) holds all data in memory — no database. Loads from JSON at startup and generates pilot/aircraft instances procedurally
-- **Combat** (`simulation/combat.py`) resolves fighter-vs-fighter and fighter-vs-bomber engagements using skill, aircraft stats, and random rolls
-- **AI** (`simulation/ai.py`) generates Luftwaffe raids (target selection by phase) and RAF intercepts; handles radar detection with range/altitude checks
-
-### Frontend (Vanilla JS / Canvas)
-
-- Single-page app with setup screen and game screen
-- Canvas-based map of southern England with coastlines, airfield markers, radar coverage arcs, and raid indicators
-- Side panel with tabs: Overview (force stats), Squadrons (filterable list), Orders (scramble/raid controls), Intel (event log)
-- All state fetched via REST API — no websockets
-
-### Key API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/state` | Full game state for UI rendering |
-| POST | `/api/advance` | Advance one turn (time step) |
-| POST | `/api/scramble` | Scramble a squadron (RAF player) |
-| POST | `/api/launch_raid` | Launch a bombing raid (Luftwaffe player) |
-| POST | `/api/set_side` | Change player side |
-| POST | `/api/set_time_scale` | Set hours per turn (1/4/12/24) |
-| POST | `/api/new_game` | Reset and start new game |
-
-### Historical Data
-
-All JSON data files use historical orders of battle as of approximately July 10, 1940. Aircraft specs (speed, armament, firepower ratings) are based on documented performance. Airfield and radar coordinates use real-world lat/lon.
-
-### Simulation Phases
-
-The game progresses through four historical phases based on date:
-1. **Kanalkampf** (Jul 10–Aug 3): Channel convoy attacks, small raids
-2. **Adlerangriff** (Aug 4–Aug 28): Eagle Attack, radar/airfield strikes
-3. **Airfield Attacks** (Aug 29–Oct 2): Sustained attacks on sector stations
-4. **London Blitz** (Oct 3+): Strategic shift to bombing London
-
-## Build & Run
-
-```bash
-python run.py              # Start dev server at http://localhost:5000
-python -c "from simulation.engine import GameEngine; e = GameEngine()"  # Quick load test
+```
+cookies -> GET /user/auth_token -> bearer token -> POST /v2/foods
 ```
 
-No build step needed — Flask serves static files directly.
+Keep every request shape in `mfp_client.py` alone, so they are easy to update
+when those endpoints change.
+
+### The three ways in
+
+| Mode | Entry point | Used by |
+|------|-------------|---------|
+| stdio MCP | `serve` | Claude Desktop, Claude Code |
+| hosted HTTP | `serve --transport http` | claude.ai web and mobile, behind `auth.py` |
+| CLI | `parse`, `create` | Terminal, scripting |
+
+Never expose the HTTP transport without the password OAuth server in
+`auth.py`: the process holds the user's MyFitnessPal session cookies. The
+server refuses to start over HTTP when `CONNECTOR_PASSWORD` is unset.
+
+### Units
+
+Labels are Australian or European: energy in kJ, values per serving and per
+100 g. MyFitnessPal wants kcal, grams, and milligrams for sodium, potassium
+and cholesterol. `nutrition.py` normalises all of that, and derives the
+serving weight from the ratio of the two columns.
+
+## Environment variables
+
+| Variable | Purpose |
+|----------|---------|
+| `MFP_COOKIE_HEADER` / `MFP_COOKIES_FILE` | MyFitnessPal session cookies |
+| `CONNECTOR_PASSWORD` | Guards the hosted server and the phone pages |
+| `CONNECTOR_SECRET` | Signs clients, tokens and food links so a redeploy does not disconnect Claude |
+| `PUBLIC_URL` / `RENDER_EXTERNAL_URL` | The public HTTPS address in hosted mode |
+
+Never commit any of these.
 
 ## Testing
 
 ```bash
-python -m pytest tests/    # Run test suite
+python -m pytest tests/
 ```
 
-The MyFitnessPal connector tests need `pip install -r connectors/myfitnesspal/requirements.txt`.
-
-## MyFitnessPal connector
-
-`connectors/myfitnesspal/` is independent of the game. It is an MCP server
-(`python -m connectors.myfitnesspal serve`) that creates custom foods in
-MyFitnessPal from a nutrition panel. MyFitnessPal has no public API; the client
-uses the website's private endpoints with browser session cookies
-(`MFP_COOKIE_HEADER` / `MFP_COOKIES_FILE`). Keep the request shapes in
-`mfp_client.py` only, so they are easy to update if the endpoints change.
-For claude.ai it runs hosted (`serve --transport http`, second service in
-`render.yaml`) behind the password OAuth server in `auth.py`; never expose the
-HTTP transport without it.
+Live calls to MyFitnessPal are **not** covered: the service is unreachable
+from the sandbox and all HTTP is mocked. Treat the endpoint shapes as
+unverified against production until someone runs a real create.
 
 ## Code Style & Conventions
 
 - Python 3.11+ with type hints (use `X | None` not `Optional[X]`)
 - Dataclasses for models, no ORM
-- All game data in `data/*.json`, loaded at startup
-- Enum values are lowercase snake_case strings
-- Frontend uses vanilla JS — no framework, no build tools
-- CSS custom properties for theming in `:root`
+- Pure functions for parsing and payload building, so they stay testable
+- Keep MyFitnessPal request shapes in `mfp_client.py` only
 
 ## Git Workflow
 
 - **Default branch**: `main`
 - Write clear, concise commit messages describing *why*, not just *what*
 - Keep commits focused — one logical change per commit
+
+## Repository history
+
+The Battle of Britain simulation was removed from this repository. Its code
+is preserved on two branches and in history:
+
+| Where | What |
+|-------|------|
+| `battle-of-britain-archive` | The full repo immediately before removal, game included |
+| `claude/claude-md-docs-06s3gq` | The game plus four features that never reached `main` (save/load, industrial targets, patrol sectors, squadron panel) |
+
+The most complete copy of the game is the second one. Do not delete either
+branch until the game has been moved to its own repository.
 
 ## AI Assistant Guidelines
 
@@ -157,5 +138,4 @@ HTTP transport without it.
 - Prefer editing existing files over creating new ones
 - Do not add features or abstractions beyond what is requested
 - Do not commit secrets, credentials, or `.env` files
-- When modifying data JSON files, validate them with `python -c "import json; json.load(open('data/FILE.json'))"`
-- After changing simulation logic, test with a quick run: `python -c "from simulation.engine import GameEngine; e = GameEngine(); e.advance_turn()"`
+- After changing the connector, run `python -m pytest tests/`
