@@ -114,14 +114,9 @@ unverified against production until someone runs a real create.
 
 ## Git Workflow
 
-- **Branch to work from**: `main`. Base every change on it and merge back into it.
+- **Default branch**: `main`. Base every change on it and merge back into it.
 - Write clear, concise commit messages describing *why*, not just *what*
 - Keep commits focused — one logical change per commit
-
-> **GitHub's default branch setting is still `claude/claude-md-docs-06s3gq`**, a
-> leftover game branch. A fresh `git clone` therefore checks out the game, not
-> this connector. Until someone changes it under Settings → Branches, always
-> `git checkout main` after cloning, and never assume the clone landed there.
 
 ## Repository history
 
@@ -136,9 +131,8 @@ Two branches here still hold copies of it. Both are now redundant:
 | `battle-of-britain-archive` | This repo immediately before the removal, game included |
 | `claude/claude-md-docs-06s3gq` | The same game tree that was pushed to the new repository |
 
-They can be deleted, but only in this order: GitHub still has the second one
-set as this repository's default branch, and a default branch cannot be
-deleted. Change the default to `main` first, then delete both.
+Nothing here depends on them any more, so both can be deleted whenever you
+want the branch list tidy.
 
 ## AI Assistant Guidelines
 
