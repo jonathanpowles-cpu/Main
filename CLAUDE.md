@@ -114,22 +114,31 @@ unverified against production until someone runs a real create.
 
 ## Git Workflow
 
-- **Default branch**: `main`
+- **Branch to work from**: `main`. Base every change on it and merge back into it.
 - Write clear, concise commit messages describing *why*, not just *what*
 - Keep commits focused — one logical change per commit
 
+> **GitHub's default branch setting is still `claude/claude-md-docs-06s3gq`**, a
+> leftover game branch. A fresh `git clone` therefore checks out the game, not
+> this connector. Until someone changes it under Settings → Branches, always
+> `git checkout main` after cloning, and never assume the clone landed there.
+
 ## Repository history
 
-The Battle of Britain simulation was removed from this repository. Its code
-is preserved on two branches and in history:
+The Battle of Britain simulation was removed from this repository. **It now
+lives at [jonathanpowles-cpu/battle-of-britain](https://github.com/jonathanpowles-cpu/battle-of-britain)**,
+with its full ten-commit history, verified running from a fresh clone.
 
-| Where | What |
-|-------|------|
-| `battle-of-britain-archive` | The full repo immediately before removal, game included |
-| `claude/claude-md-docs-06s3gq` | The game plus four features that never reached `main` (save/load, industrial targets, patrol sectors, squadron panel) |
+Two branches here still hold copies of it. Both are now redundant:
 
-The most complete copy of the game is the second one. Do not delete either
-branch until the game has been moved to its own repository.
+| Branch | What |
+|--------|------|
+| `battle-of-britain-archive` | This repo immediately before the removal, game included |
+| `claude/claude-md-docs-06s3gq` | The same game tree that was pushed to the new repository |
+
+They can be deleted, but only in this order: GitHub still has the second one
+set as this repository's default branch, and a default branch cannot be
+deleted. Change the default to `main` first, then delete both.
 
 ## AI Assistant Guidelines
 
