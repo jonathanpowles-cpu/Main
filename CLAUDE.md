@@ -92,7 +92,11 @@ of each other:
 So a recipe page given nutrition links through to its food page. Keep the
 recipe page free of scripts, images and layout, and keep all three markup
 forms (JSON-LD, microdata, hRecipe) — the importer is old and picks whichever
-it recognises.
+it recognises. Keep every field visible as well as marked up: Paprika, the
+other consumer of this page, warns that its clipper may miss a recipe that
+lives only in the metadata. Microdata reads `content` only on `<meta>`, so
+canonical values (ISO 8601 durations, calories) go there and the human-readable
+form goes in the visible text.
 
 ### Units
 

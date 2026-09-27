@@ -250,3 +250,43 @@ def test_page_titles_use_the_dish_name():
 
     assert "<title>Hoisin chicken tacos</title>" in render_recipe_page(_recipe(), "http://localhost/recipe/x")
     assert "<title>Beef &amp; garlic rice bowl</title>" in render_food_page(_spec(), [], "http://localhost/food/x")
+
+
+def test_iso_durations():
+    from connectors.myfitnesspal.links import _iso_duration
+
+    assert [_iso_duration(m) for m in (5, 60, 90, 125)] == ["PT5M", "PT1H", "PT1H30M", "PT2H5M"]
+
+
+def test_recipe_carries_times_and_categories():
+    links = FoodLinks(_auth(), client_factory=RecordingClient)
+    spec = _recipe(categories=["Dinner", "Chicken"], prep_time_minutes=10, cook_time_minutes=15)
+    url = links.make_recipe(spec)
+    back = links.load_recipe(url.rsplit("/", 1)[1])
+    assert back.categories == ["Dinner", "Chicken"]
+    assert (back.prep_time_minutes, back.cook_time_minutes) == (10, 15)
+    with _client() as client:
+        r = client.get(url)
+        ld = json.loads(re.search(r"<script type='application/ld\+json'>(.*?)</script>", r.text, re.S).group(1))
+        assert (ld["prepTime"], ld["cookTime"], ld["totalTime"]) == ("PT10M", "PT15M", "PT25M")
+        assert ld["recipeCategory"] == ["Dinner", "Chicken"]
+        # microdata carries the canonical values on <meta>, which is the only
+        # element whose content attribute microdata reads.
+        assert "<meta itemprop='prepTime' content='PT10M'>" in r.text
+        assert "<p class='preptime'>Prep 10 min</p>" in r.text
+        assert "itemprop='recipeCategory'>Dinner<" in r.text
+
+
+def test_recipe_nutrition_is_visible_not_just_metadata():
+    """Paprika's clipper may not find a recipe that lives only in the markup."""
+    from connectors.myfitnesspal.links import render_recipe_page
+
+    page_html = render_recipe_page(_recipe(nutrition=_spec().nutrition), "http://localhost/recipe/x")
+    assert "<h2>Nutrition per serving</h2>" in page_html
+    assert "itemprop='nutrition' itemscope" in page_html
+    assert "<meta itemprop='calories' content='641 calories'>" in page_html
+    assert "<td>Energy</td><td>2680 kJ / 641 Cal</td>" in page_html
+    assert "<td>— saturated</td><td><span itemprop='saturatedFatContent'>9.4 g</span></td>" in page_html
+    assert "Serves <span class='yield' itemprop='recipeYield'>2 servings</span> (432 g each)" in page_html
+    # ...and stays out of the way when the card gave no nutrition.
+    assert "Nutrition per serving" not in render_recipe_page(_recipe(), "http://localhost/recipe/x")

@@ -71,6 +71,9 @@ class RecipeSpec:
     description: str | None = None
     author: str | None = None
     source_url: str | None = None
+    categories: list[str] = field(default_factory=list)
+    prep_time_minutes: int | None = None
+    cook_time_minutes: int | None = None
     nutrition: NutritionFacts | None = None
 
 
@@ -123,9 +126,11 @@ class FoodLinks:
             "i": [line.strip() for line in spec.ingredients if line.strip()],
         }
         for key, value in (("d", spec.instructions), ("de", spec.description),
-                           ("a", spec.author), ("u", spec.source_url)):
+                           ("a", spec.author), ("u", spec.source_url),
+                           ("cat", spec.categories), ("pt", spec.prep_time_minutes),
+                           ("ct", spec.cook_time_minutes)):
             if value:
-                payload[key] = [line.strip() for line in value if line.strip()] if key == "d" else value
+                payload[key] = [line.strip() for line in value if line.strip()] if key in ("d", "cat") else value
         if spec.nutrition is not None:
             payload["nu"] = {k: v for k, v in spec.nutrition.to_dict().items() if v is not None}
         return f"{self.public_url}/recipe/{self.auth.signer.sign(payload, compress=True)}"
@@ -142,6 +147,9 @@ class FoodLinks:
             description=payload.get("de"),
             author=payload.get("a"),
             source_url=payload.get("u"),
+            categories=list(payload.get("cat", [])),
+            prep_time_minutes=payload.get("pt"),
+            cook_time_minutes=payload.get("ct"),
             nutrition=NutritionFacts(**payload["nu"]) if payload.get("nu") else None,
         )
 
@@ -205,6 +213,39 @@ def _nutrition_schema(facts: NutritionFacts, serving_size: str) -> dict[str, Any
         if value is not None:
             nutrition[prop] = f"{value:g} {unit}"
     return nutrition
+
+
+def _iso_duration(minutes: int) -> str:
+    """Minutes as an ISO 8601 duration, which is how schema.org states times."""
+    hours, rest = divmod(int(minutes), 60)
+    return "PT" + (f"{hours}H" if hours else "") + (f"{rest}M" if rest or not hours else "")
+
+
+# Readable nutrition rows, in the order an Australian panel prints them:
+# NutritionFacts field -> label, unit, schema.org property.
+_PANEL_ROWS: list[tuple[str, str, str, str]] = [
+    ("protein_g", "Protein", "g", "proteinContent"),
+    ("fat_g", "Fat, total", "g", "fatContent"),
+    ("saturated_fat_g", "\u2014 saturated", "g", "saturatedFatContent"),
+    ("carbohydrates_g", "Carbohydrate", "g", "carbohydrateContent"),
+    ("sugars_g", "\u2014 sugars", "g", "sugarContent"),
+    ("fibre_g", "Dietary fibre", "g", "fiberContent"),
+    ("sodium_mg", "Sodium", "mg", "sodiumContent"),
+    ("potassium_mg", "Potassium", "mg", "potassiumContent"),
+    ("cholesterol_mg", "Cholesterol", "mg", "cholesterolContent"),
+]
+
+
+def _panel_rows(facts: NutritionFacts) -> list[tuple[str, str, str]]:
+    energy = f"{round(facts.calories)} Cal"
+    if facts.energy_kj:
+        energy = f"{facts.energy_kj:g} kJ / {energy}"
+    rows = [("Energy", energy, "calories")]
+    for field_name, label, unit, prop in _PANEL_ROWS:
+        value = getattr(facts, field_name)
+        if value is not None:
+            rows.append((label, f"{value:g} {unit}", prop))
+    return rows
 
 
 def _script(data: dict[str, Any]) -> str:
@@ -278,6 +319,13 @@ def recipe_page_json_ld(spec: RecipeSpec, url: str) -> dict[str, Any]:
         data["author"] = {"@type": "Organization", "name": spec.author}
     if spec.source_url:
         data["isBasedOn"] = spec.source_url
+    if spec.categories:
+        data["recipeCategory"] = list(spec.categories)
+    total = (spec.prep_time_minutes or 0) + (spec.cook_time_minutes or 0)
+    for key, minutes in (("prepTime", spec.prep_time_minutes), ("cookTime", spec.cook_time_minutes),
+                         ("totalTime", total or None)):
+        if minutes:
+            data[key] = _iso_duration(minutes)
     if spec.nutrition is not None:
         data["nutrition"] = _nutrition_schema(spec.nutrition, "1 serving")
     return data
@@ -287,6 +335,8 @@ _RECIPE_STYLE = (
     "main{width:min(560px,92vw)}"
     "ul,ol{padding-left:1.2rem}li{margin:.35rem 0}"
     "h2{font-size:1rem;margin:1.5rem 0 .5rem}"
+    "table{width:100%;border-collapse:collapse}"
+    "td{padding:.3rem 0;border-bottom:1px solid #2a2a2a}td:last-child{text-align:right}"
     "textarea{width:100%;box-sizing:border-box;height:9rem;background:#111;color:#eee;"
     "border:1px solid #444;border-radius:8px;padding:.6rem;font:14px/1.5 ui-monospace,monospace}"
     "a{color:#93c5fd}"
@@ -296,12 +346,51 @@ _RECIPE_STYLE = (
 def render_recipe_page(spec: RecipeSpec, url: str, food_url: str | None = None) -> str:
     """A deliberately plain recipe page for MyFitnessPal's importer.
 
-    No scripts, no images, no wrapper markup. The ingredients are marked up
-    three ways — JSON-LD, schema.org microdata and hRecipe class names —
-    because different scrapers look for different ones and there is no cost
-    to satisfying all three.
+    No scripts, no images, no wrapper markup. Everything is marked up three
+    ways — JSON-LD, schema.org microdata and hRecipe class names — because
+    different scrapers look for different ones and there is no cost to
+    satisfying all three. Everything is also *visible*: Paprika's clipper
+    warns that it may not find a recipe that is only in the metadata.
     """
     yield_text = f"{spec.servings:g} serving{'' if spec.servings == 1 else 's'}"
+    weight = spec.nutrition.serving_weight_g if spec.nutrition else None
+    serves = f"Serves <span class='yield' itemprop='recipeYield'>{html.escape(yield_text)}</span>"
+    if weight:
+        serves += f" ({weight:g} g each)"
+    times = "".join(
+        f"<meta itemprop='{prop}' content='{_iso_duration(minutes)}'>"
+        f"<p class='{cls}'>{label} {minutes} min</p>"
+        for cls, label, prop, minutes in (
+            ("preptime", "Prep", "prepTime", spec.prep_time_minutes),
+            ("duration", "Cook", "cookTime", spec.cook_time_minutes),
+        )
+        if minutes
+    )
+    categories = (
+        "<p>" + " · ".join(
+            f"<span itemprop='recipeCategory'>{html.escape(c)}</span>" for c in spec.categories
+        ) + "</p>"
+        if spec.categories
+        else ""
+    )
+    # Paprika's clipper warns that the recipe must be *visible* on the page, so
+    # the label's figures go in a real table rather than only into the JSON-LD.
+    nutrition = (
+        "<h2>Nutrition per serving</h2>"
+        "<table class='nutrition' itemprop='nutrition' itemscope "
+        "itemtype='https://schema.org/NutritionInformation'>"
+        + f"<meta itemprop='calories' content='{round(spec.nutrition.calories)} calories'>"
+        + f"<meta itemprop='servingSize' content='1 serving'>"
+        + "".join(
+            f"<tr><td>{html.escape(label)}</td><td>"
+            + (html.escape(value) if prop == "calories" else f"<span itemprop='{prop}'>{html.escape(value)}</span>")
+            + "</td></tr>"
+            for label, value, prop in _panel_rows(spec.nutrition)
+        )
+        + "</table>"
+        if spec.nutrition is not None
+        else ""
+    )
     ingredients = "".join(
         f"<li class='ingredient' itemprop='recipeIngredient'>{html.escape(line)}</li>" for line in spec.ingredients
     )
@@ -328,10 +417,10 @@ def render_recipe_page(spec: RecipeSpec, url: str, food_url: str | None = None) 
     body = (
         f"<div class='hrecipe' itemscope itemtype='https://schema.org/Recipe'>"
         f"<h1 class='fn' itemprop='name'>{html.escape(spec.name)}</h1>"
-        f"{summary}{author}"
-        f"<p>Serves <span class='yield' itemprop='recipeYield'>{html.escape(yield_text)}</span></p>"
+        f"{summary}{author}{categories}"
+        f"<p>{serves}</p>{times}"
         f"<h2>Ingredients</h2><ul>{ingredients}</ul>"
-        f"{steps}{source}</div>"
+        f"{steps}{nutrition}{source}</div>"
         f"<h2>Import into MyFitnessPal</h2>"
         f"<p>In the app: <i>Recipes → Import Recipe</i>, and paste this page's address.</p>"
         f"<p>If it refuses the link, tap <i>Enter Ingredients Manually</i> and paste this instead:</p>"

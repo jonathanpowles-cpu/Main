@@ -169,11 +169,25 @@ against its own food database, and adds up the results. So:
   a recipe page given nutrition links through to its own `/food/…` page.
 
 The page is deliberately dull: no scripts, no images, no layout to confuse a
-scraper. Every ingredient is marked up three ways at once — JSON-LD,
-schema.org microdata and legacy hRecipe class names — so it survives whichever
-one the importer happens to understand. It also prints the ingredient list in
-a text box, because the app's *Enter Ingredients Manually* takes a pasted list
-and needs no link at all. That is the fallback when the importer refuses a URL.
+scraper. Everything is marked up three ways at once — JSON-LD, schema.org
+microdata and legacy hRecipe class names — so it survives whichever one the
+importer happens to understand, and everything is also *visible*, since some
+clippers will not trust a recipe that exists only in the metadata. It prints
+the ingredient list in a text box too, because the app's *Enter Ingredients
+Manually* takes a pasted list and needs no link at all. That is the fallback
+when the importer refuses a URL.
+
+### Recipe managers
+
+The same page imports into a recipe manager, which is often the better home
+for it. Paprika clips it from its built-in browser (**Download**) or from
+Safari's share sheet, and reads the fields that map onto its own: name,
+servings, prep and cook times, categories, ingredients, directions, source and
+nutritional info. Pass `prep_time_minutes`, `cook_time_minutes` and
+`categories` when you know them — they cost nothing and Paprika keeps them.
+Nutrition is worth attaching for this route even though MyFitnessPal ignores
+it: Paprika's nutrition field is free text, so the card's figures survive
+intact.
 
 ## Tools
 

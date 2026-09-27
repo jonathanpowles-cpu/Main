@@ -177,6 +177,9 @@ def create_server(client_factory=MFPClient.from_env, auth: PasswordAuthProvider 
             description: str | None = None,
             author: str | None = None,
             source_url: str | None = None,
+            categories: list[str] | None = None,
+            prep_time_minutes: int | None = None,
+            cook_time_minutes: int | None = None,
             nutrition: NutritionInput | None = None,
             per_100g: NutritionInput | None = None,
         ) -> dict[str, Any]:
@@ -194,6 +197,9 @@ def create_server(client_factory=MFPClient.from_env, auth: PasswordAuthProvider 
                 description=description,
                 author=author,
                 source_url=source_url,
+                categories=categories or [],
+                prep_time_minutes=prep_time_minutes,
+                cook_time_minutes=cook_time_minutes,
                 nutrition=facts,
             )
             url = links.make_recipe(spec)
