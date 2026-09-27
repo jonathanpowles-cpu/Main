@@ -288,9 +288,9 @@ input{background:#111;color:#eee;margin:.75rem 0}button{background:#3b82f6;color
 """
 
 
-def page(body_html: str) -> str:
+def page(body_html: str, title: str = "MyFitnessPal connector") -> str:
     return f"<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'>" \
-           f"<title>MyFitnessPal connector</title><style>{_STYLE}</style></head><body><main>{body_html}</main></body></html>"
+           f"<title>{html.escape(title)}</title><style>{_STYLE}</style></head><body><main>{body_html}</main></body></html>"
 
 
 def _login_form(txn: str, client_name: str, error: str | None = None) -> str:
