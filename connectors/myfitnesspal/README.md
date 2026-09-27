@@ -144,13 +144,50 @@ gives you two ways in:
    food is created in your account and shows up under *My Foods* in the app.
 2. **Recipes → Create a Recipe → Import from web** in the MyFitnessPal app,
    pasting the link. The page carries schema.org `Recipe` data (ingredients,
-   yield and per-serving nutrition) for the importer. MyFitnessPal's importer
-   matches ingredient lines against its database, so give Claude the recipe's
-   ingredient list as well for best results.
+   yield and per-serving nutrition) for the importer.
 
 From the CLI the same link comes from `create … --link`, with
 `--ingredient "…"` repeated per line and `PUBLIC_URL`, `CONNECTOR_PASSWORD`
 and `CONNECTOR_SECRET` set.
+
+### Recipes: `/recipe/…` and what the importer actually does
+
+`create_recipe_link` publishes a whole recipe — yours, one Claude wrote, or
+one read off a card — at `https://<your-host>/recipe/z…`, again with nothing
+stored server-side. Paste that into *Recipes → Import Recipe* in the app.
+
+It is worth being clear about what MyFitnessPal does with it, because it is
+not what the page looks like it offers. **The importer never reads a page's
+published nutrition.** It scrapes the ingredient lines, matches each one
+against its own food database, and adds up the results. So:
+
+- Write ingredient lines like a shopping list, one item each, with a quantity
+  and a unit MyFitnessPal can look up: `330 g chicken breast`, not
+  `1 packet chicken`. Meal-kit "1 packet" lines are exactly what it fails on.
+- The calories you get are MyFitnessPal's estimate of the dish, not the
+  figures printed on the card. If you want those, use a food link instead —
+  a recipe page given nutrition links through to its own `/food/…` page.
+
+The page is deliberately dull: no scripts, no images, no layout to confuse a
+scraper. Everything is marked up three ways at once — JSON-LD, schema.org
+microdata and legacy hRecipe class names — so it survives whichever one the
+importer happens to understand, and everything is also *visible*, since some
+clippers will not trust a recipe that exists only in the metadata. It prints
+the ingredient list in a text box too, because the app's *Enter Ingredients
+Manually* takes a pasted list and needs no link at all. That is the fallback
+when the importer refuses a URL.
+
+### Recipe managers
+
+The same page imports into a recipe manager, which is often the better home
+for it. Paprika clips it from its built-in browser (**Download**) or from
+Safari's share sheet, and reads the fields that map onto its own: name,
+servings, prep and cook times, categories, ingredients, directions, source and
+nutritional info. Pass `prep_time_minutes`, `cook_time_minutes` and
+`categories` when you know them — they cost nothing and Paprika keeps them.
+Nutrition is worth attaching for this route even though MyFitnessPal ignores
+it: Paprika's nutrition field is free text, so the card's figures survive
+intact.
 
 ## Tools
 
@@ -161,6 +198,7 @@ and `CONNECTOR_SECRET` set.
 | `create_food(…same args…)` | Create the food in MyFitnessPal |
 | `create_food_from_label(name, label_text, brand?, …)` | Parse and create in one step |
 | `create_food_link(name, nutrition, brand?, ingredients?, …)` | Hosted mode only: return a phone-friendly link for the food (see above) |
+| `create_recipe_link(name, ingredients, servings?, instructions?, nutrition?, …)` | Hosted mode only: publish a recipe page for MyFitnessPal's importer (see above) |
 
 `nutrition` takes the per-serving values: `calories` or `energy_kj` (one is
 required), `protein_g`, `fat_g`, `saturated_fat_g`, `trans_fat_g`,

@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from pydantic import BaseModel, Field, model_validator
 
 from .auth import SCOPE, PasswordAuthProvider
-from .links import FoodLinks
+from .links import FoodLinks, RecipeSpec
 from .mfp_client import FoodSpec, MFPClient
 from .nutrition import NutritionFacts, derive_serving_weight_g, kj_to_kcal, parse_label
 
@@ -36,6 +36,16 @@ If the user is on their phone or asks for a link, call create_food_link
 instead (when available): it returns a page they can open on the phone to add
 the food, or paste into the MyFitnessPal app's "Import from web". Pass the
 recipe's ingredient lines too if they are visible.
+
+For an actual recipe — the user's own, one you wrote, or one read off a card —
+call create_recipe_link (when available). It publishes a plain recipe page for
+the MyFitnessPal importer, which matches each ingredient line against its own
+food database and works out the nutrition itself. Write the lines like a
+shopping list, one ingredient each, with a quantity and a unit MyFitnessPal
+can look up: "330 g chicken breast", not "1 packet chicken". Attach the
+label's nutrition as well if you have it; the page then also offers those
+exact figures as a custom food, because the importer ignores published
+nutrition entirely.
 """
 
 
@@ -141,6 +151,7 @@ def create_server(client_factory=MFPClient.from_env, auth: PasswordAuthProvider 
         links = FoodLinks(auth, client_factory=client_factory)
         server.custom_route("/food/{token}", methods=["GET"])(links.food_page)
         server.custom_route("/food/{token}/add", methods=["POST"])(links.add_food)
+        server.custom_route("/recipe/{token}", methods=["GET"])(links.recipe_page)
 
         @server.tool()
         def create_food_link(
@@ -156,6 +167,48 @@ def create_server(client_factory=MFPClient.from_env, auth: PasswordAuthProvider 
             spec = build_spec(name, nutrition, brand, serving_description, per_100g, country_code)
             url = links.make(spec, ingredients)
             return {"url": url, "nutrition": spec.nutrition.to_dict(), "ingredients": ingredients or []}
+
+        @server.tool()
+        def create_recipe_link(
+            name: str,
+            ingredients: list[str],
+            servings: float = 1.0,
+            instructions: list[str] | None = None,
+            description: str | None = None,
+            author: str | None = None,
+            source_url: str | None = None,
+            categories: list[str] | None = None,
+            prep_time_minutes: int | None = None,
+            cook_time_minutes: int | None = None,
+            nutrition: NutritionInput | None = None,
+            per_100g: NutritionInput | None = None,
+        ) -> dict[str, Any]:
+            """Publish a recipe as a plain page for the MyFitnessPal app's Recipes > Import Recipe. MyFitnessPal reads only the ingredient lines and works out the nutrition from its own database, so give one ingredient per line with a quantity and a unit it can look up ("330 g chicken breast"). Pass nutrition as well if the card printed it: the page then also links to a custom food carrying those exact figures. Creates nothing until the user acts."""
+            facts = None
+            if nutrition is not None:
+                facts = nutrition.to_facts()
+                if per_100g is not None and facts.serving_weight_g is None:
+                    facts.serving_weight_g = derive_serving_weight_g(facts, per_100g.to_facts())
+            spec = RecipeSpec(
+                name=name,
+                ingredients=ingredients,
+                servings=servings,
+                instructions=instructions or [],
+                description=description,
+                author=author,
+                source_url=source_url,
+                categories=categories or [],
+                prep_time_minutes=prep_time_minutes,
+                cook_time_minutes=cook_time_minutes,
+                nutrition=facts,
+            )
+            url = links.make_recipe(spec)
+            return {
+                "url": url,
+                "servings": servings,
+                "ingredients": spec.ingredients,
+                "nutrition": facts.to_dict() if facts else None,
+            }
 
     @server.tool()
     def parse_nutrition_label(label_text: str) -> dict[str, Any]:

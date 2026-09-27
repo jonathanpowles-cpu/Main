@@ -43,14 +43,14 @@ See `connectors/myfitnesspal/README.md` for install, hosting and phone usage.
 │       ├── mfp_client.py      # MyFitnessPal client: cookies -> token -> create food
 │       ├── server.py          # MCP server and its tools
 │       ├── auth.py            # Password-guarded OAuth 2.1 server for hosted mode
-│       ├── links.py           # Shareable per-food links and their phone page
+│       ├── links.py           # Shareable food and recipe links, and their pages
 │       └── Dockerfile         # Build from the repo root
 └── tests/
     ├── test_nutrition.py      # Label parsing and unit conversion
     ├── test_mfp_client.py     # Payload building and client (HTTP mocked)
     ├── test_mfp_server.py     # MCP tools
     ├── test_mfp_auth.py       # Hosted OAuth flow end to end
-    └── test_mfp_links.py      # Shareable food links and the phone page
+    └── test_mfp_links.py      # Shareable food and recipe links, and their pages
 ```
 
 ## Architecture
@@ -76,6 +76,27 @@ when those endpoints change.
 Never expose the HTTP transport without the password OAuth server in
 `auth.py`: the process holds the user's MyFitnessPal session cookies. The
 server refuses to start over HTTP when `CONNECTOR_PASSWORD` is unset.
+
+### Two link routes, two different answers
+
+`links.py` serves `/food/<token>` and `/recipe/<token>`. They are not variants
+of each other:
+
+- `/food` carries the label's exact figures and offers to create them as a
+  private custom food through `mfp_client.py`.
+- `/recipe` exists to be scraped by MyFitnessPal's *Import Recipe*, which
+  **ignores published nutrition** and instead matches each ingredient line
+  against its own database. Its numbers are MyFitnessPal's estimate, not the
+  card's.
+
+So a recipe page given nutrition links through to its food page. Keep the
+recipe page free of scripts, images and layout, and keep all three markup
+forms (JSON-LD, microdata, hRecipe) — the importer is old and picks whichever
+it recognises. Keep every field visible as well as marked up: Paprika, the
+other consumer of this page, warns that its clipper may miss a recipe that
+lives only in the metadata. Microdata reads `content` only on `<meta>`, so
+canonical values (ISO 8601 durations, calories) go there and the human-readable
+form goes in the visible text.
 
 ### Units
 

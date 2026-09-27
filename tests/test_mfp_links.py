@@ -129,3 +129,164 @@ def test_serving_line_omits_weight_when_unknown():
     spec.nutrition.serving_weight_g = None
     page = render_food_page(spec, [], "http://localhost/food/x")
     assert "<p>Per 1 serving</p>" in page
+
+
+# -- recipe links --------------------------------------------------------------
+
+RECIPE_INGREDIENTS = [
+    "330 g chicken breast",
+    "6 mini flour tortillas",
+    "1 baby cos lettuce",
+    "1 cucumber",
+    "2 tbs hoisin sauce",
+    "1/2 tbs soy sauce",
+    "2 tbs garlic aioli",
+    "1 drizzle olive oil",
+]
+METHOD = [
+    "Slice the chicken into 1cm strips and fry over high heat until browned.",
+    "Add the hoisin and soy with a splash of water; toss to glaze.",
+    "Fill the tortillas with salad and chicken, then drizzle with aioli.",
+]
+
+
+def _recipe(**overrides):
+    from connectors.myfitnesspal.links import RecipeSpec
+
+    kwargs = dict(
+        name="Hoisin chicken tacos",
+        ingredients=RECIPE_INGREDIENTS,
+        servings=2,
+        instructions=METHOD,
+        author="HelloFresh",
+    )
+    kwargs.update(overrides)
+    return RecipeSpec(**kwargs)
+
+
+def test_recipe_link_round_trips():
+    links = FoodLinks(_auth(), client_factory=RecordingClient)
+    url = links.make_recipe(_recipe())
+    assert url.startswith(f"{PUBLIC_URL}/recipe/z")
+    token = url.rsplit("/", 1)[1]
+    spec = links.load_recipe(token)
+    assert spec.name == "Hoisin chicken tacos"
+    assert spec.ingredients == RECIPE_INGREDIENTS
+    assert spec.instructions == METHOD
+    assert spec.servings == 2 and spec.author == "HelloFresh" and spec.nutrition is None
+    # A recipe token must not be usable as a food token, or vice versa.
+    assert links.load(token) is None
+    assert links.load_recipe(links.make(_spec()).rsplit("/", 1)[1]) is None
+    assert FoodLinks(_auth("other"), client_factory=RecordingClient).load_recipe(token) is None
+
+
+def test_recipe_link_stays_pasteable():
+    """The whole recipe rides in the URL, so watch its size as fields are added."""
+    links = FoodLinks(_auth(), client_factory=RecordingClient)
+    assert len(links.make_recipe(_recipe(instructions=[]))) < 500
+    assert len(links.make_recipe(_recipe())) < 900
+
+
+def test_recipe_page_marks_ingredients_up_three_ways():
+    url = FoodLinks(_auth(), client_factory=RecordingClient).make_recipe(_recipe())
+    with _client() as client:
+        r = client.get(url)
+        assert r.status_code == 200
+        ld = json.loads(re.search(r"<script type='application/ld\+json'>(.*?)</script>", r.text, re.S).group(1))
+        assert ld["@type"] == "Recipe"
+        assert ld["name"] == "Hoisin chicken tacos"
+        assert ld["recipeIngredient"] == RECIPE_INGREDIENTS
+        assert ld["recipeYield"] == "2 servings"
+        assert ld["recipeInstructions"][0]["text"] == METHOD[0]
+        assert "nutrition" not in ld
+        # microdata and hRecipe, for scrapers that do not read JSON-LD
+        assert "itemtype='https://schema.org/Recipe'" in r.text
+        assert "<li class='ingredient' itemprop='recipeIngredient'>330 g chicken breast</li>" in r.text
+        assert "class='fn' itemprop='name'" in r.text and "class='yield'" in r.text
+        # the paste-it-yourself fallback
+        assert "330 g chicken breast\n6 mini flour tortillas" in r.text
+        assert client.get(f"{PUBLIC_URL}/recipe/forged.token").status_code == 404
+
+
+def test_recipe_page_links_to_the_exact_food_when_nutrition_is_given():
+    links = FoodLinks(_auth(), client_factory=RecordingClient)
+    url = links.make_recipe(_recipe(nutrition=_spec().nutrition))
+    with _client() as client:
+        r = client.get(url)
+        assert r.status_code == 200
+        ld = json.loads(re.search(r"<script type='application/ld\+json'>(.*?)</script>", r.text, re.S).group(1))
+        assert ld["nutrition"]["calories"] == "641 calories"
+        food_url = re.search(r"href='(http://localhost/food/[^']+)'", r.text).group(1)
+        spec, ingredients = links.load(food_url.rsplit("/", 1)[1])
+        assert spec.nutrition.calories == 641 and spec.brand == "HelloFresh"
+        assert ingredients == RECIPE_INGREDIENTS
+        assert client.get(food_url).status_code == 200
+
+
+def test_create_recipe_link_tool():
+    import asyncio
+
+    server = create_server(client_factory=RecordingClient, auth=_auth())
+    names = {t.name for t in asyncio.run(server.list_tools())}
+    assert "create_recipe_link" in names
+    assert "create_recipe_link" not in {
+        t.name for t in asyncio.run(create_server(client_factory=RecordingClient).list_tools())
+    }
+    result = asyncio.run(
+        server.call_tool(
+            "create_recipe_link",
+            {"name": "Hoisin chicken tacos", "ingredients": RECIPE_INGREDIENTS, "servings": 2,
+             "nutrition": {"energy_kj": 2680, "protein_g": 36.9}, "per_100g": {"energy_kj": 620}},
+        )
+    )
+    out = json.loads(result.content[0].text)
+    assert out["url"].startswith(f"{PUBLIC_URL}/recipe/")
+    assert out["servings"] == 2
+    assert out["nutrition"]["serving_weight_g"] == 432
+
+
+def test_page_titles_use_the_dish_name():
+    from connectors.myfitnesspal.links import render_recipe_page
+
+    assert "<title>Hoisin chicken tacos</title>" in render_recipe_page(_recipe(), "http://localhost/recipe/x")
+    assert "<title>Beef &amp; garlic rice bowl</title>" in render_food_page(_spec(), [], "http://localhost/food/x")
+
+
+def test_iso_durations():
+    from connectors.myfitnesspal.links import _iso_duration
+
+    assert [_iso_duration(m) for m in (5, 60, 90, 125)] == ["PT5M", "PT1H", "PT1H30M", "PT2H5M"]
+
+
+def test_recipe_carries_times_and_categories():
+    links = FoodLinks(_auth(), client_factory=RecordingClient)
+    spec = _recipe(categories=["Dinner", "Chicken"], prep_time_minutes=10, cook_time_minutes=15)
+    url = links.make_recipe(spec)
+    back = links.load_recipe(url.rsplit("/", 1)[1])
+    assert back.categories == ["Dinner", "Chicken"]
+    assert (back.prep_time_minutes, back.cook_time_minutes) == (10, 15)
+    with _client() as client:
+        r = client.get(url)
+        ld = json.loads(re.search(r"<script type='application/ld\+json'>(.*?)</script>", r.text, re.S).group(1))
+        assert (ld["prepTime"], ld["cookTime"], ld["totalTime"]) == ("PT10M", "PT15M", "PT25M")
+        assert ld["recipeCategory"] == ["Dinner", "Chicken"]
+        # microdata carries the canonical values on <meta>, which is the only
+        # element whose content attribute microdata reads.
+        assert "<meta itemprop='prepTime' content='PT10M'>" in r.text
+        assert "<p class='preptime'>Prep 10 min</p>" in r.text
+        assert "itemprop='recipeCategory'>Dinner<" in r.text
+
+
+def test_recipe_nutrition_is_visible_not_just_metadata():
+    """Paprika's clipper may not find a recipe that lives only in the markup."""
+    from connectors.myfitnesspal.links import render_recipe_page
+
+    page_html = render_recipe_page(_recipe(nutrition=_spec().nutrition), "http://localhost/recipe/x")
+    assert "<h2>Nutrition per serving</h2>" in page_html
+    assert "itemprop='nutrition' itemscope" in page_html
+    assert "<meta itemprop='calories' content='641 calories'>" in page_html
+    assert "<td>Energy</td><td>2680 kJ / 641 Cal</td>" in page_html
+    assert "<td>— saturated</td><td><span itemprop='saturatedFatContent'>9.4 g</span></td>" in page_html
+    assert "Serves <span class='yield' itemprop='recipeYield'>2 servings</span> (432 g each)" in page_html
+    # ...and stays out of the way when the card gave no nutrition.
+    assert "Nutrition per serving" not in render_recipe_page(_recipe(), "http://localhost/recipe/x")
